@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>iOS 18 Simulator</title>
+    <title>Simulateur iPhone</title>
+    <link rel="stylesheet" href="settings-simulator.css">
+    <script defer src="settings-simulator.js"></script>
     <style>
         body {
             display: flex;
@@ -22749,16 +22751,7 @@ var youtubeTemplate = `
                         appView.classList.add(appSpecificClass);
                     }
                     if (appId === "settings") {
-                        const rows = appMainContent.querySelectorAll(".settings-row");
-                        rows.forEach((row) => {
-                            const toggle = row.querySelector(".toggle");
-                            if (toggle) {
-                                row.addEventListener("click", (e) => {
-                                    e.stopPropagation();
-                                    toggle.classList.toggle("on");
-                                });
-                            }
-                        });
+                        window.setupSettingsSimulator(appMainContent);
                     }
                     if (appId === "phone") {
                         const cur = window.getCurrentCall ? window.getCurrentCall() : null;
