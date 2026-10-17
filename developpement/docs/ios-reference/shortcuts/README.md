@@ -59,3 +59,25 @@ instructions centrales, panneau inférieur arrondi, barre de recherche et
 catégories. Le choix entre les deux versions reste une fonction propre au site.
 Les paramètres et les données sont aussi conservés lors d’une mise à jour ou
 d’un changement de nom de l’app dans le registre partagé.
+
+
+## Refonte HTML — 17 octobre 2026
+
+L’application a été réécrite dans `applications/raccourcis.js`, avec une entrée
+HTML autonome `applications/raccourcis.html` et une intégration au téléphone.
+Les anciens raccourcis sont conservés sous la clé `ios_shortcuts`. La sauvegarde
+JSON comprend aussi les dossiers et automatisations ; son import ajoute des copies
+avec de nouveaux identifiants, sans écraser les raccourcis existants.
+
+Les tests `shortcuts-rewrite.cjs` et `shortcuts-data.cjs` couvrent les parcours
+intégrés et autonomes, la persistance, les deux modes, le calcul, l’annulation,
+l’import/export et la protection des actions intelligentes avant effets.
+Les déclencheurs natifs et les modèles Apple ne sont pas exécutés par cette page web.
+Le téléchargement de fichiers est annulé par le Chrome automatisé de cet environnement,
+y compris dans un essai minimal indépendant de l’application ; le contenu JSON
+exporté est donc également présenté dans un champ copiable, testé par le parcours.
+
+Une capture native exacte iPhone 17 Pro / iOS 27.0 a été demandée dans
+[GitHub Actions](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39069025805).
+Lors de la validation locale, elle était encore en cours, sans artefact disponible.
+La refonte ne constitue donc pas une reproduction au pixel près vérifiée sur iOS 27.
