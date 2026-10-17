@@ -9,7 +9,7 @@ const {chromium}=require('playwright');
  const open=app=>page.evaluate(id=>window.openApp(id),app);
  const settingsRow=name=>root.locator('.settings-row').filter({has:page.getByText(name,{exact:true})});
  await open('settings');await settingsRow('Batterie').click();
- assert(await root.getByRole('img',{name:/Historique de batterie/}).count());
+ assert(await root.getByRole('group',{name:/Historique de batterie/}).count());
  await root.getByRole('button',{name:'10 derniers jours',exact:true}).click();assert.match(await root.innerText(),/UTILISATION DE LA BATTERIE/);
  await page.screenshot({path:'scratch/battery-rebuilt.png',animations:'disabled'});
  await root.getByRole('button',{name:/^Recharge/}).click();await root.getByRole('button',{name:'85 %',exact:true}).click();assert.equal(await root.getByRole('checkbox',{name:'Recharge optimisée de la batterie'}).count(),0);

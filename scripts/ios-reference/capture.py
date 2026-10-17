@@ -20,7 +20,7 @@ def main():
     result = run("xcrun", "simctl", "list", "--json", capture_output=True)
     inventory = json.loads(result.stdout)
     (OUT / "inventory.json").write_text(result.stdout)
-    requested = os.environ.get("IOS_MAJOR", "18")
+    requested = os.environ.get("IOS_MAJOR", "26")
     runtimes = [r for r in inventory["runtimes"] if r.get("isAvailable")
                 and r["identifier"].startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
                 and (requested == "auto" or r["version"].split(".")[0] == requested)]

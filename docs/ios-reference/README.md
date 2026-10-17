@@ -71,3 +71,50 @@ Les propositions iOS 26 puis iOS 27 suivent la
 
 L’éditeur Raccourcis web et son moteur local ne reproduisent qu’un sous-ensemble
 des actions iOS. Une correspondance intégrale, écran par écran, n’est pas certifiée.
+
+
+## Référence iOS 26.2 — 17 octobre 2026
+
+La demande de runtime `26` a démarré un **iPhone 16 Pro Max sous iOS 26.2,
+build 23C54**, en mode sombre, sans connexion à un compte Apple.
+[Exécution native](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39064759520).
+11 tests : 5 réussis, 6 ignorés, aucune erreur ; 17 captures PNG, diagnostics compris.
+Les captures utiles sont dans [ios26](ios26/). La navigation et les onglets
+Raccourcis ont été ajustés à partir de ces images : boutons arrondis et barre
+Bibliothèque / Automatisation / Galerie flottante après installation simulée
+d’iOS 26. La recherche des Réglages est alors présentée en bas de l’écran.
+
+Le runtime ne propose toujours pas Wi-Fi, Batterie, Recharge, AirDrop, Mise à jour
+logicielle ni l’App Store. **Aucune mise à jour OTA Apple n’a donc pu être lancée
+ou capturée.** Il s’agit d’un démarrage d’un runtime 26.2 déjà installé, pas d’une
+mise à niveau OTA depuis iOS 18. Les captures locales `update-available`,
+`update-downloading`, `update-ready`, `update-installing`, `update-installed`
+proviennent exclusivement de la simulation web testée de bout en bout.
+
+Le compte et les appareils sont des données fictives, avec navigation inspirée de
+la [documentation Apple sur la liste des appareils](https://support.apple.com/fr-fr/102649).
+Apple documente l’installation de runtimes dans
+[Xcode](https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
+
+
+La [capture complémentaire](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39065043309)
+a également réussi : 14 tests, 7 réussis, 7 ignorés, aucune erreur, 19 captures PNG.
+Photos et Wallet sont installés ; Appareil photo et App Store sont absents.
+Les images `21-photos.png` et `22-wallet.png` sont conservées dans `ios26/`.
+Wallet est capturé avec sa demande initiale de localisation encore affichée :
+cette image fournit une référence partielle, pas un parcours Wallet complet.
+Le simulateur web ne reproduit pas cette demande d’autorisation système.
+Photos s’inspire de la grille et des contrôles de cette capture, avec Collections,
+Favoris, Vidéos et recherche locales. L’appareil photo web utilise la caméra du
+navigateur si elle est autorisée ; les vidéos sont de vrais enregistrements
+MediaRecorder et ne simulent pas les modes de capture spécialisés d’Apple.
+
+
+## Captures de la reconstruction web
+
+Les [captures locales](web/) montrent le compte, Batterie, Wallet, Raccourcis et
+Réglages après la mise à jour simulée, ainsi que les cinq étapes du cycle de
+mise à jour. Elles sont distinctes des images natives dans `ios26/`. Les données
+personnelles, appareils, chiffres de batterie et billets y sont des exemples de test.
+Ces captures documentent une reproduction partielle, pas une conformité pixel
+par pixel de l’ensemble d’iOS ni l’accès aux services Apple.

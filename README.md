@@ -98,3 +98,40 @@ ainsi que `node tests/dark-apps.cjs` et `node tests/update-system.cjs`.
 mise à jour, AirDrop, Raccourcis multi-actions et la fermeture des applications.
 La variable `CHROME_PATH` permet d’utiliser un
 Chrome installé. Les cartes nécessitent l’accès à leur dépendance Leaflet externe.
+
+
+Le compte Apple dispose d’une page dédiée, de sous-menus (identité, sécurité,
+iCloud, paiements, abonnements, famille, Localiser) et de fiches pour trois
+appareils fictifs. Le nom et la liste d’appareils sont locaux : il ne s’agit pas
+d’une connexion au compte Apple du visiteur. iCloud présente la photothèque locale
+sans envoyer de données sur un service distant.
+
+Les graphiques Batterie sont sélectionnables et proposent l’affichage par durée
+ou pourcentage. En Wi-Fi, les champs IP et DNS dépendent du mode automatique ou
+manuel. Luminosité, texte gras, animations réduites et économie d’énergie ont des
+effets visibles sur le téléphone simulé.
+
+`wallet-simulator.js` et `wallet-simulator.css` fournissent un portefeuille local
+de billets et de cartes de fidélité fictifs : ajout, recherche, détail, renommage
+et suppression. Aucune carte bancaire ni transaction n’est prise en charge.
+Les réglages de grille et de qualité vidéo sont repris à l’ouverture d’Appareil
+photo. Les captures caméra rejoignent la photothèque partagée de Photos.
+Raccourcis propose les apps actuellement installées et un ensemble explicite
+d’actions de navigation, notamment ouvrir Wi-Fi, Batterie et les mises à jour.
+Installer une app ne crée pas arbitrairement de nouvelles capacités natives.
+
+`node tests/account-connected.cjs` vérifie le compte, les appareils, les graphiques,
+Wallet, les actions et le cycle complet iOS 26 avec captures des étapes.
+`node tests/camera-photos.cjs` vérifie les réglages caméra et une prise de vue avec
+le périphérique vidéo de test de Chromium, suivie de son ouverture dans Photos.
+
+
+Conserver aussi `photos-enhancements.css`, `wallet-simulator.js` et
+`wallet-simulator.css` avec le site. Photos possède des collections Favoris et
+Vidéos, une recherche locale et des favoris persistants. La caméra enregistre de
+courtes vidéos WebM via MediaRecorder, stockées avec une vignette dans le
+navigateur ; la résolution demandée dépend des réglages, et la résolution obtenue
+dépend de la caméra. Les modes Cinématique, Ralenti et Accéléré restent des
+présentations de démonstration. Les enregistrements n’incluent pas de microphone.
+Le stockage du navigateur est limité : les longues vidéos ne conviennent pas à
+ce stockage local. Le flux caméra est arrêté à la sortie de l’app.

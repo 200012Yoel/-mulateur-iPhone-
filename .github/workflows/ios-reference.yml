@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
     inputs:
       ios_major:
-        description: Version majeure déjà installée sur le runner (18 ou auto)
-        default: '18'
+        description: Version majeure déjà installée sur le runner (26, 18 ou auto)
+        default: '26'
         required: true
 permissions:
   contents: read

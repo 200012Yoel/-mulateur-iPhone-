@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="liquid-glass.css">
     <link rel="stylesheet" href="shortcuts-simulator.css">
     <script defer src="shortcuts-simulator.js"></script>
+    <script defer src="wallet-simulator.js"></script>
+    <link rel="stylesheet" href="wallet-simulator.css">
+    <link rel="stylesheet" href="photos-enhancements.css">
     <script defer src="system-interactions.js"></script>
     <script defer src="dark-theme.js"></script>
     <script defer src="settings-simulator.js"></script>
@@ -12944,7 +12947,7 @@
     <style>
         .camera-app-container {
             position: absolute;
-            inset: 0;
+            inset: 32px 0 0;
             background: #000;
             display: flex;
             flex-direction: column;
@@ -16692,12 +16695,15 @@ var youtubeTemplate = `
                 const portraitOverlay = container.querySelector("#cam-portrait-overlay");
                 const portraitLightLabel = container.querySelector("#cam-portrait-light-label");
                 const gridOverlay = container.querySelector("#cam-grid-overlay");
+                try { const preferences=JSON.parse(localStorage.getItem('iphone.settings.v1')||'{}');gridOverlay?.classList.toggle('active',Boolean(preferences['App : Appareil photo/Grille']??preferences['Appareil photo/Grille']));const quality=preferences['App : Appareil photo/Enregistrer une vidéo']??preferences['Appareil photo/Enregistrer une vidéo'];if(quality)container.querySelector('#cam-rec-quality').textContent=quality.replace(' à ',' • ').replace(' i/s',''); } catch {}
                 const focusReticle = container.querySelector("#cam-focus-reticle");
 
                 let currentFacingMode = "environment";
                 let currentStream = null;
+                let cameraAlive = true;
                 let currentZoom = "1";
                 let currentMode = "PHOTO";
+                requestAnimationFrame(()=>{const selected=container.querySelector('.cam-mode-btn.active'),carousel=container.querySelector('#cam-mode-carousel');if(selected&&carousel)carousel.scrollLeft=selected.offsetLeft-carousel.offsetLeft-(carousel.clientWidth-selected.offsetWidth)/2;});
                 let timerDelay = 0; // 0, 3, 10
                 let isRecording = false;
                 let recordSeconds = 0;
@@ -16715,7 +16721,7 @@ var youtubeTemplate = `
                         const photos = JSON.parse(localStorage.getItem("capturedPhotos") || "[]");
                         if (photos.length > 0) {
                             const first = photos[0];
-                            const src = first && typeof first === "object" ? first.src : first;
+                            const src = first && typeof first === "object" ? first.poster || first.src : first;
                             galleryThumb.style.backgroundImage = `url('${src}')`;
                         } else {
                             galleryThumb.style.backgroundImage = `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&auto=format&fit=crop&q=80')`;
@@ -16740,9 +16746,10 @@ var youtubeTemplate = `
                     }
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({
-                            video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                            video: (()=>{let prefs={};try{prefs=JSON.parse(localStorage.getItem('iphone.settings.v1')||'{}');}catch{}const quality=prefs['App : Appareil photo/Enregistrer une vidéo']??prefs['Appareil photo/Enregistrer une vidéo']??'1080p à 30 i/s';return {facingMode:facing,width:{ideal:quality.includes('4K')?3840:1920},height:{ideal:quality.includes('4K')?2160:1080},frameRate:{ideal:quality.includes('60')?60:30}};})(),
                             audio: false
                         });
+                        if(!cameraAlive || !container.isConnected){stream.getTracks().forEach(track=>track.stop());return;}
                         if (viewfinderVideo) {
                             viewfinderVideo.srcObject = stream;
                             viewfinderVideo.style.display = "block";
@@ -17026,6 +17033,7 @@ var youtubeTemplate = `
                         const photos = JSON.parse(localStorage.getItem("capturedPhotos") || "[]");
                         const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
                         photos.unshift({
+                            id:'media-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
                             src: photoSrc,
                             date: dateStr,
                             mode: currentMode,
@@ -17047,6 +17055,16 @@ var youtubeTemplate = `
                         // Video / Cinematic / Slow-Mo / Timelapse Recording
                         if (currentMode.includes("VID") || currentMode.includes("CIN") || currentMode.includes("RALENTI") || currentMode.includes("ACCÉLÉRÉ")) {
                             if (!isRecording) {
+                                if(!currentStream || typeof MediaRecorder==='undefined'){recHeader?.classList.add('active');if(recTimerText)recTimerText.textContent='Caméra vidéo indisponible';setTimeout(()=>recHeader?.classList.remove('active'),2500);return;}
+                                recordedChunks=[];
+                                const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(type=>MediaRecorder.isTypeSupported(type));
+                                try{mediaRecorder=new MediaRecorder(currentStream,mime?{mimeType:mime}:{});}catch{if(recTimerText)recTimerText.textContent='Enregistrement indisponible';recHeader?.classList.add('active');return;}
+                                const recorder=mediaRecorder,chunks=[],started=Date.now();
+                                const posterCanvas=document.createElement('canvas');posterCanvas.width=320;posterCanvas.height=180;try{posterCanvas.getContext('2d').drawImage(viewfinderVideo,0,0,320,180);}catch{}
+                                const poster=posterCanvas.toDataURL('image/jpeg',.7);
+                                recorder.ondataavailable=event=>{if(event.data.size)chunks.push(event.data);};
+                                recorder.onstop=()=>{const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});const reader=new FileReader();const duration=Math.max(1,Math.round((Date.now()-started)/1000));reader.onload=()=>{try{const photos=JSON.parse(localStorage.getItem('capturedPhotos')||'[]');photos.unshift({id:'media-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),src:reader.result,poster,date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}),mode:currentMode,duration:duration+'s',isVideo:true});localStorage.setItem('capturedPhotos',JSON.stringify(photos));refreshGalleryThumb();window.refreshSimulatorPhotos?.();}catch{if(recTimerText)recTimerText.textContent='Stockage local plein';recHeader?.classList.add('active');}};reader.readAsDataURL(blob);};
+                                mediaRecorder.start(250);
                                 isRecording = true;
                                 shutterBtn.classList.add("recording");
                                 recHeader?.classList.add("active");
@@ -17068,20 +17086,7 @@ var youtubeTemplate = `
                                 clearInterval(recordInterval);
                                 playShutterSound();
 
-                                try {
-                                    const photos = JSON.parse(localStorage.getItem("capturedPhotos") || "[]");
-                                    const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-                                    photos.unshift({
-                                        src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80",
-                                        date: dateStr,
-                                        mode: currentMode,
-                                        duration: `${recordSeconds}s`,
-                                        isVideo: true
-                                    });
-                                    localStorage.setItem("capturedPhotos", JSON.stringify(photos));
-                                } catch (err) {
-                                    console.error(err);
-                                }
+                                if(mediaRecorder?.state==='recording')mediaRecorder.stop();
                                 refreshGalleryThumb();
                             }
                             return;
@@ -17110,9 +17115,11 @@ var youtubeTemplate = `
                     });
                 }
 
+                window.simulatorCameraCleanup=()=>{cameraAlive=false;if(mediaRecorder?.state==='recording')mediaRecorder.stop();if(currentStream){currentStream.getTracks().forEach(track=>track.stop());currentStream=null;}if(recordInterval)clearInterval(recordInterval);};
                 // Cleanup stream on close
                 const originalCloseApp = window.closeApp;
                 window.closeApp = function () {
+                    window.simulatorCameraCleanup?.();
                     if (currentStream) {
                         currentStream.getTracks().forEach((track) => track.stop());
                         currentStream = null;
@@ -17286,7 +17293,9 @@ var youtubeTemplate = `
                 ];
                 let photos = [];
                 let currentIndex = 0;
-                let likedPhotos = /* @__PURE__ */ new Set();
+                let galleryFilter='all',galleryQuery='';
+                let likedPhotos=new Set();try{const saved=JSON.parse(localStorage.getItem('iphone.photos.favorites')||'[]');if(Array.isArray(saved))likedPhotos=new Set(saved);}catch{}
+                const photoKey=photo=>{if(!photo)return '';if(!photo.real)return 'demo-'+photo.demoIndex;if(photo.mediaId)return photo.mediaId;let hash=2166136261;for(const c of photo.src||''){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619);}return 'media-'+(hash>>>0)+'-'+(photo.src?.length||0);};
                 let isSelectionMode = false;
                 let selectedIndices = /* @__PURE__ */ new Set();
                 const loadPhotos = () => {
@@ -17309,11 +17318,13 @@ var youtubeTemplate = `
                         if (typeof item === "string") {
                             return { src: item, date: "Aujourd'hui", sub: "", real: true };
                         } else if (item && typeof item === "object") {
-                            return { src: item.src, date: item.date || "Aujourd'hui", sub: "", real: true, video: item.isVideo ? "0:10" : undefined, isVideo: item.isVideo };
+                            return { src: item.src, mediaId:item.id, poster:item.poster, date: item.date || "Aujourd'hui", sub: "", real: true, video: item.isVideo ? item.duration || "Vidéo" : undefined, isVideo: item.isVideo };
                         }
                         return null;
                     }).filter(Boolean).concat(currentDemoPhotos);
+                    photos=photos.filter(photo=>(galleryFilter!=='favorites'||likedPhotos.has(photoKey(photo)))&&(galleryFilter!=='videos'||Boolean(photo.isVideo||photo.video))&&(!galleryQuery||(photo.date+' '+(photo.mode||'')+' '+(photo.isVideo?'vidéo':'photo')).toLocaleLowerCase('fr').includes(galleryQuery.toLocaleLowerCase('fr'))));
                 };
+                window.refreshSimulatorPhotos=()=>{if(content.isConnected)renderGallery();};
                 const groupByDate = () => {
                     const map = {};
                     photos.forEach((p, i) => {
@@ -17338,7 +17349,7 @@ var youtubeTemplate = `
                             html += `
                     <div class="photo-cell ${isSelectionMode ? isSelected ? "selecting" : "not-selecting" : ""}" data-index="${photo.id}">
                         <div class="photo-content">
-                            ${photo.real ? `<img src="${photo.src}" />` : `<span style="font-size:32px">${photo.icon}</span>`}
+                            ${photo.real ? `<img src="${photo.poster || photo.src}" />` : `<span style="font-size:32px">${photo.icon}</span>`}
                             ${isSelectionMode ? `<div class="select-badge">${isSelected ? "\u2713" : ""}</div>` : ""}
                         </div>
                         ${photo.video ? `<div class="video-badge">${photo.video}</div>` : ""}
@@ -17374,7 +17385,7 @@ var youtubeTemplate = `
                 const buildStrip = () => {
                     swipeStrip.innerHTML = photos.map((p, i) => `
             <div class="strip-thumb${i === currentIndex ? " active" : ""}" data-index="${i}">
-                ${p.real ? `<img src="${p.src}" />` : `<span>${p.icon}</span>`}
+                ${p.real ? `<img src="${p.poster || p.src}" />` : `<span>${p.icon}</span>`}
             </div>
         `).join("");
                     swipeStrip.querySelectorAll(".strip-thumb").forEach((thumb) => {
@@ -17420,7 +17431,7 @@ var youtubeTemplate = `
                         lbDateInfo.textContent = `${p.date} ${p.sub ? "\u2022 " + p.sub : ""}`;
                         const heart = likeBtn?.querySelector("#lb-heart-svg");
                         if (heart) {
-                            if (likedPhotos.has(currentIndex)) {
+                            if (likedPhotos.has(photoKey(photos[currentIndex]))) {
                                 heart.style.fill = "red";
                                 heart.style.stroke = "red";
                             } else {
@@ -17533,8 +17544,9 @@ var youtubeTemplate = `
                 });
                 likeBtn?.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    if (likedPhotos.has(currentIndex)) likedPhotos.delete(currentIndex);
-                    else likedPhotos.add(currentIndex);
+                    if (likedPhotos.has(photoKey(photos[currentIndex]))) likedPhotos.delete(photoKey(photos[currentIndex]));
+                    else likedPhotos.add(photoKey(photos[currentIndex]));
+                    localStorage.setItem('iphone.photos.favorites',JSON.stringify([...likedPhotos]));
                     updateLightbox();
                 });
                 let touchStartX = 0, touchStartY = 0;
@@ -17634,11 +17646,22 @@ var youtubeTemplate = `
                         });
                     });
                 }
+                const galleryContainer=appMainContent.querySelector('#gallery-app-container');
+                let galleryPrefs={};try{galleryPrefs=JSON.parse(localStorage.getItem('iphone.settings.v1')||'{}');}catch{}
+                galleryContainer.classList.toggle('gm-ios26',Number(galleryPrefs['update/installedMajor']||18)>=26);
+                const galleryTitle=galleryContainer.querySelector('.gallery-title');galleryTitle.textContent='Photothèque';
+                const tabs=[...galleryContainer.querySelectorAll('.gallery-tab-bar .tab-item')];
+                const symbols=['▣','▤','⌕'];tabs.forEach((tab,index)=>{tab.querySelector('.tab-icon').textContent=symbols[index];tab.setAttribute('role','button');tab.tabIndex=0;tab.setAttribute('aria-label',['Photothèque','Collections','Rechercher dans Photos'][index]);tab.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();tab.click();}};tab.onclick=()=>{
+                    if(isSelectionMode)return;tabs.forEach(item=>item.classList.toggle('active',item===tab));galleryContainer.querySelector('.gm-search')?.remove();galleryQuery='';galleryFilter='all';
+                    if(index===1){galleryTitle.textContent='Collections';content.innerHTML='<div class="gm-collections"><button data-collection="favorites">♡ Favoris <span>›</span></button><button data-collection="videos">▹ Vidéos <span>›</span></button><button data-collection="all">▣ Toutes les photos <span>›</span></button></div>';content.querySelectorAll('[data-collection]').forEach(button=>button.onclick=()=>{galleryFilter=button.dataset.collection;galleryTitle.textContent=galleryFilter==='favorites'?'Favoris':galleryFilter==='videos'?'Vidéos':'Photothèque';renderGallery();});return;}
+                    galleryTitle.textContent=index===2?'Rechercher':'Photothèque';if(index===2){const input=document.createElement('input');input.className='gm-search';input.type='search';input.placeholder='Date, photo, vidéo';input.setAttribute('aria-label','Rechercher dans la photothèque');galleryContainer.querySelector('.gallery-header').append(input);input.oninput=()=>{galleryQuery=input.value;renderGallery();};input.focus();}renderGallery();
+                };});
                 renderGallery();
             }
 
             // js/apps/handlers/wallet.js
             function setupWalletApp() {
+                if(window.setupWalletSimulator)return window.setupWalletSimulator(document.querySelector("#wallet-app-container"));
                 const container = document.querySelector("#wallet-app-container");
                 if (!container) return;
                 const track = container.querySelector("#wallet-track");
@@ -21580,6 +21603,7 @@ var youtubeTemplate = `
                 const appMainContent = appView ? appView.querySelector(".app-main-content") : null;
                 const dynamicIsland = document.querySelector(".dynamic-island");
                 function openApp(appId) {
+                    if(appId!=='camera')window.simulatorCameraCleanup?.();
                     if (!appView || !appHeaderContainer || !appMainContent) return;
                     if (!window.activeApps) {
                         window.activeApps = [];

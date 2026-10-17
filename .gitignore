@@ -7,3 +7,9 @@ scratch/*-glass.png
 scratch/*-dark.png
 scratch/*-rebuilt.png
 scratch/updates-two-versions.png
+
+scratch/update-available.png
+scratch/update-downloading.png
+scratch/update-ready.png
+scratch/update-installing.png
+scratch/update-installed.png

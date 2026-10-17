@@ -47,3 +47,6 @@
 .shm-auto-empty>div{font-size:65px;color:#0a84ff}.shm-auto-empty h2{font-size:23px;letter-spacing:-.5px;margin:20px 0 5px}
 .shm-auto-empty p{font-size:14px;color:#98989f;line-height:1.5}
 .shm-auto-empty .shm-primary{max-width:280px;border-radius:12px;background:#0a84ff;color:white;margin-top:16px}
+
+/* iOS 26 variants measured from the native 26.2 captures. */
+.shm-ios26 .shm-nav button{background:#1c1c1e;color:#f5f5f7;border:1px solid #ffffff15;border-radius:28px;padding:10px 15px;min-height:42px}.shm-ios26 .shm-nav>div{gap:10px}.shm-ios26 [data-create]{width:43px;padding:0!important;font-size:29px}.shm-ios26 [data-folder]{width:43px;padding:0!important;font-size:32px}.shm-ios26 h1{margin-top:18px;font-size:32px}.shm-ios26 .shm-search{border-radius:28px;background:#202020;padding:14px 18px}.shm-ios26 .shm-tabs{background:#202020ed;border:1px solid #ffffff20;border-radius:36px;left:28px;right:28px;bottom:16px;padding:3px;box-shadow:0 0 0 3px #ffffff09;backdrop-filter:blur(24px)}.shm-ios26 .shm-tabs button{border-radius:30px;min-height:48px;padding:6px 3px}.shm-ios26 .shm-tabs button[aria-current=page]{background:#454547;color:#18aafa}
