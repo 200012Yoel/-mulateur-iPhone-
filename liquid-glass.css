@@ -63,3 +63,9 @@
 #system-keyboard .key.special{background:#3a3b40;color:#fff}
 #system-keyboard .key.active-shift{background:#dedee3;color:#171719}
 #system-keyboard .key:active{background:#84858c}
+.sim-app-row{gap:12px}
+.sim-app-icon{position:relative;width:30px;height:30px;flex:none;border-radius:7px;overflow:hidden;display:grid;place-items:center;background:#383a42;color:#fff;pointer-events:none;contain:paint}
+.sim-app-icon>div,.sim-app-icon>svg{position:absolute;left:0;top:0;width:60px!important;height:60px!important;transform:scale(.5);transform-origin:top left;object-fit:cover}
+.sim-app-icon>img{width:30px!important;height:30px!important;object-fit:cover;border-radius:7px}
+.sim-app-icon svg{max-width:100%;max-height:100%}
+.sim-app-name{flex:1}

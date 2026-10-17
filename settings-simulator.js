@@ -12,6 +12,11 @@
   const field = (label, value) => ({label, type: 'field', value});
   const info = (label, value) => ({label, type: 'info', value});
   const apps = ['Appareil photo', 'App Store', 'Calendrier', 'Cartes', 'Contacts', 'FaceTime', 'Fichiers', 'Horloge', 'Mail', 'Messages', 'Musique', 'Notes', 'Photos', 'Rappels', 'Safari', 'Téléphone'];
+  const catalog = () => typeof window.getSimulatorApps === 'function' ? window.getSimulatorApps() : apps.map(name=>({id:name,name}));
+  for(const event of ['simulator-apps-changed','app-installed','app-updated','app-uninstalled','storage'])window.addEventListener(event,e=>{
+    if(event==='storage' && !['ios_installed_apps','ios_uninstalled_apps',null].includes(e.key))return;
+    document.querySelectorAll('.settings-active .app-main-content').forEach(root=>root.refreshSettingsApps?.());
+  });
   const pages = {
     'Apple Intelligence et Siri': [toggle('Apple Intelligence'), link('Parler et écrire à Siri'), choice('Langue', ['Français (France)', 'English (United States)']), choice('Voix', ['Voix 1', 'Voix 2']), link('Réponses de Siri'), toggle('Autoriser Siri lorsque verrouillé'), link('ChatGPT'), link('Rapport Apple Intelligence')],
     'Parler et écrire à Siri': [choice('Détecter', ['« Siri » ou « Dis Siri »', '« Dis Siri »', 'Non']), toggle('Bouton latéral pour Siri'), toggle('Écrire à Siri')],
@@ -83,6 +88,7 @@
     let updateTimer;
     let route = initialPage ? [initialPage] : [], original = root.innerHTML;
     const optionPages = new Map();
+    root.refreshSettingsApps=()=>{if(root.settingsSession===session && (route.at(-1)==='Apps' || route.at(-1)?.startsWith('App : ')))render();};
     const keyFor = (title, row) => title + '/' + row.label;
     function applyAppearance() {
       root.classList.add('sim-dark');
@@ -126,6 +132,7 @@
       }
       const title = route.at(-1), rows = definition(title);
       if (title === 'Wi-Fi') return renderWifi();
+      if (title === 'Apps') return renderApps();
       if (title === 'Mise à jour logicielle') return renderUpdate();
       if (optionPages.has(title)) return renderOptions(optionPages.get(title));
       root.innerHTML = `<nav class="sim-nav"><button data-back aria-label="Retour">‹ ${esc(route.length > 1 ? route.at(-2) : 'Réglages')}</button><span>${esc(title.replace(/^(Réseau|App|Notifications|Autorisation|Accessoire) : /,''))}</span></nav>${title === 'Apple Intelligence et Siri' ? '<header class="sim-ai-hero"><div class="sim-ai-orb">✦</div><h2>Apple Intelligence<br>et Siri</h2><p>Une intelligence personnelle, intégrée à votre iPhone.</p></header>' : ''}<p class="sim-note">Réglages enregistrés sur ce navigateur. ${title === 'Apple Intelligence et Siri' ? 'Interface de démonstration ; les services Apple ne sont pas connectés.' : ''}</p><div class="sim-group">${rows.map((row,i) => {
@@ -174,6 +181,18 @@
       return `<nav class="sim-nav"><button data-back aria-label="Retour">‹ ${esc(parent)}</button><span>${esc(title)}</span></nav>`;
     }
     function backButton() { root.querySelector('[data-back]').onclick=()=>{route.pop();render();}; }
+    function renderApps() {
+      const query=root.querySelector('[data-app-search]')?.value || '';
+      const list=catalog().sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+      root.innerHTML=nav('Apps')+'<h1 class="sim-page-title">Apps</h1><input class="sim-search" data-app-search placeholder="Rechercher une app" aria-label="Rechercher une app"><div class="sim-group" data-app-list></div><p class="sim-note">Les apps et leurs icônes suivent celles de l’écran d’accueil du simulateur.</p>';
+      const search=root.querySelector('[data-app-search]');search.value=query;
+      function filter() {
+        const matches=list.filter(app=>app.name.toLocaleLowerCase('fr').includes(search.value.toLocaleLowerCase('fr')));
+        root.querySelector('[data-app-list]').innerHTML=matches.length?matches.map(app=>`<button class="sim-option-row sim-app-row" data-app-id="${esc(app.id)}"><span class="sim-app-icon" aria-hidden="true">${app.iconHTML || esc(app.name.slice(0,1))}</span><span class="sim-app-name">${esc(app.name)}</span><span class="sim-chevron" aria-hidden="true">›</span></button>`).join(''):'<p class="sim-note" role="status">Aucune app trouvée.</p>';
+        root.querySelectorAll('[data-app-id]').forEach(button=>button.onclick=()=>{const app=list.find(a=>a.id===button.dataset.appId);if(app)open('App : '+app.name);});
+      }
+      search.oninput=filter;filter();backButton();root.scrollTop=0;
+    }
     function renderOptions(page) {
       const value=get(page.key,page.options[0]);
       const prefix=page.key.slice(0,page.key.lastIndexOf('/'));

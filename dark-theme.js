@@ -1,6 +1,6 @@
 (() => {
   // Adapt legacy application templates that use inline light colors.
-  const excluded = 'svg,svg *,img,video,canvas,.app-icon,.app-icon *,[class*="map-tile"],.leaflet-pane,.leaflet-pane *';
+  const excluded = 'svg,svg *,img,video,canvas,.app-icon,.app-icon *,.sim-app-icon,.sim-app-icon *,[class*="map-tile"],.leaflet-pane,.leaflet-pane *';
   function adapt(root) {
     for (const el of [root, ...root.querySelectorAll('*')]) {
       if (el.matches(excluded)) continue;

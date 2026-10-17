@@ -173,11 +173,11 @@
     <style>
         /* App Icon specific styles moved from styles/apps.css */
 
-        .app-icon .phone-icon {
+        :is(.app-icon, .sim-app-icon) .phone-icon {
             background: linear-gradient(to bottom, #34c759, #28a745);
         }
 
-        .app-icon .phone-icon svg {
+        :is(.app-icon, .sim-app-icon) .phone-icon svg {
             width: 60%;
             height: 60%;
             color: #fff;
@@ -185,17 +185,17 @@
             stroke-linejoin: round;
         }
 
-        .app-icon .phone-icon svg path {
+        :is(.app-icon, .sim-app-icon) .phone-icon svg path {
             stroke: currentColor;
             fill: none;
             stroke-width: 2.5;
         }
 
-        .app-icon .imessage-icon {
+        :is(.app-icon, .sim-app-icon) .imessage-icon {
             background: linear-gradient(to bottom, #34c759, #30b457);
         }
 
-        .app-icon .imessage-icon svg {
+        :is(.app-icon, .sim-app-icon) .imessage-icon svg {
             width: 65%;
             height: auto;
             aspect-ratio: 1 / 1;
@@ -203,23 +203,23 @@
             stroke: none;
         }
 
-        .app-icon .imessage-icon svg path {
+        :is(.app-icon, .sim-app-icon) .imessage-icon svg path {
             fill: white;
             stroke: none;
         }
 
-        .app-icon .contacts-icon {
+        :is(.app-icon, .sim-app-icon) .contacts-icon {
             background-color: #34c759;
         }
 
-        .app-icon .safari-icon {
+        :is(.app-icon, .sim-app-icon) .safari-icon {
             background-color: #007aff;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .app-icon .safari-icon .compass {
+        :is(.app-icon, .sim-app-icon) .safari-icon .compass {
             width: 80%;
             height: 80%;
             background: white;
@@ -231,7 +231,7 @@
             align-items: center;
         }
 
-        .app-icon .safari-icon .needle {
+        :is(.app-icon, .sim-app-icon) .safari-icon .needle {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -241,7 +241,7 @@
             z-index: 2;
         }
 
-        .app-icon .safari-icon .needle::before {
+        :is(.app-icon, .sim-app-icon) .safari-icon .needle::before {
             content: '';
             position: absolute;
             top: calc(-12px - 2px);
@@ -254,7 +254,7 @@
             border-bottom: 12px solid red;
         }
 
-        .app-icon .safari-icon .needle::after {
+        :is(.app-icon, .sim-app-icon) .safari-icon .needle::after {
             content: '';
             position: absolute;
             bottom: calc(-12px - 2px);
@@ -267,7 +267,7 @@
             border-top: 12px solid blue;
         }
 
-        .app-icon .safari-icon .ticks {
+        :is(.app-icon, .sim-app-icon) .safari-icon .ticks {
             position: absolute;
             top: 0;
             left: 0;
@@ -277,7 +277,7 @@
             overflow: hidden;
         }
 
-        .app-icon .safari-icon .tick {
+        :is(.app-icon, .sim-app-icon) .safari-icon .tick {
             position: absolute;
             width: 1px;
             height: 4px;
@@ -287,7 +287,7 @@
             transform-origin: center 24px;
         }
 
-        .app-icon .apple-music-icon {
+        :is(.app-icon, .sim-app-icon) .apple-music-icon {
             background: linear-gradient(to bottom right, #fc2c55, #aa2c9e);
             border-radius: 15px;
             display: flex;
@@ -296,7 +296,7 @@
             overflow: hidden;
         }
 
-        .app-icon .apple-music-icon .music-note-icon {
+        :is(.app-icon, .sim-app-icon) .apple-music-icon .music-note-icon {
             width: 65%;
             height: 65%;
             fill: white;
@@ -304,7 +304,7 @@
             display: block;
         }
 
-        .app-icon .appstore-icon {
+        :is(.app-icon, .sim-app-icon) .appstore-icon {
             background-color: #0a84ff;
             display: flex;
             justify-content: center;
@@ -316,21 +316,21 @@
             height: 65%;
         }
 
-        .app-icon .camera-icon {
+        :is(.app-icon, .sim-app-icon) .camera-icon {
             background-color: #000;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .app-icon .camera-icon svg {
+        :is(.app-icon, .sim-app-icon) .camera-icon svg {
             width: 60%;
             height: 60%;
             fill: white;
         }
 
         /* Galerie app icon */
-        .app-icon .galerie-icon {
+        :is(.app-icon, .sim-app-icon) .galerie-icon {
             background: linear-gradient(180deg, #ffffff, #f2f2f4);
             border-radius: 12px;
             display: flex;
@@ -339,14 +339,14 @@
             overflow: hidden;
         }
 
-        .app-icon .galerie-icon svg {
+        :is(.app-icon, .sim-app-icon) .galerie-icon svg {
             width: 62%;
             height: 62%;
             display: block;
         }
 
         /* Apple Intelligence icon */
-        .app-icon .intelligence-icon {
+        :is(.app-icon, .sim-app-icon) .intelligence-icon {
             background: #000;
             border-radius: 12px;
             display: flex;
@@ -355,13 +355,13 @@
             overflow: hidden;
         }
 
-        .app-icon .intelligence-icon svg {
+        :is(.app-icon, .sim-app-icon) .intelligence-icon svg {
             width: 85%;
             height: 85%;
         }
 
         /* YouTube app icon */
-        .app-icon .youtube-icon {
+        :is(.app-icon, .sim-app-icon) .youtube-icon {
             background-color: #ff0000;
             border-radius: 14px;
             display: flex;
@@ -371,7 +371,7 @@
         }
 
         /* Instagram app icon */
-        .app-icon .instagram-icon {
+        :is(.app-icon, .sim-app-icon) .instagram-icon {
             background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeB 90%);
             border-radius: 14px;
             display: flex;
@@ -381,7 +381,7 @@
         }
 
         /* 2048 app icon */
-        .app-icon .game2048-icon {
+        :is(.app-icon, .sim-app-icon) .game2048-icon {
             background: linear-gradient(135deg, #edc22e, #f2b179);
             border-radius: 14px;
             display: flex;
@@ -11445,7 +11445,7 @@
             border-radius: 14px !important;
         }
 
-        .dock .app-icon .imessage-icon svg {
+        .dock :is(.app-icon, .sim-app-icon) .imessage-icon svg {
             width: 65%;
             height: auto;
             aspect-ratio: 1 / 1;
@@ -12337,7 +12337,7 @@
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        .app-icon .maps-icon {
+        :is(.app-icon, .sim-app-icon) .maps-icon {
             width: 100%;
             height: 100%;
             display: flex;
@@ -18593,7 +18593,7 @@ var youtubeTemplate = `
                 if (installed.length > 0) {
                     const defaultIds = DEFAULT_APPS.map((a) => a.id);
                     const customApps = installed.filter((a) => !defaultIds.includes(a.id));
-                    finalApps = [...DEFAULT_APPS, ...customApps];
+                    finalApps = [...DEFAULT_APPS.map(app => ({ ...app, ...installed.find(saved => saved.id === app.id) })), ...customApps];
                 } else {
                     finalApps = [...DEFAULT_APPS];
                 }
@@ -18793,7 +18793,11 @@ var youtubeTemplate = `
                 const isDownloading = window.activeDownloads && window.activeDownloads[app.id];
                 const progress = isDownloading ? window.activeDownloads[app.id].progress : 100;
                 const fallbackFontSize = isDock ? "24px" : "28px";
-                const iconHTML = APP_ICONS2[app.id] || `
+                let customIcon = "";
+                if (typeof app.iconURL === "string" && /^https?:\/\//i.test(app.iconURL)) {
+                    const image = document.createElement("img"); image.src = app.iconURL; image.alt = ""; image.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:inherit"; customIcon = image.outerHTML;
+                }
+                const iconHTML = customIcon || APP_ICONS2[app.id] || `
         <div class="generic-fallback-icon" style="background: linear-gradient(135deg, #007aff, #54a6ff); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: white; font-weight: 800; font-size: ${fallbackFontSize}; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
             ${app.name ? app.name.substring(0, 1).toUpperCase() : "?"}
         </div>
@@ -18813,7 +18817,17 @@ var youtubeTemplate = `
                 }
                 return { innerHTML, displayName, isDownloading };
             }
+            window.updateSimulatorApp = (id, changes) => {
+                const entries = getInstalledApps(); const app = entries.find(item => item.id === id);
+                if (!app) return false;
+                for (const key of ["name", "iconURL", "version"]) if (typeof changes[key] === "string") app[key] = changes[key];
+                localStorage.setItem("ios_installed_apps", JSON.stringify(entries));
+                renderHomeScreen(); window.dispatchEvent(new CustomEvent("app-updated", { detail: { appId: id } })); return true;
+            };
+            // Shared registry: Settings and Home consume the same current app records/icons.
+            window.getSimulatorApps = () => getInstalledApps().map(app => ({ ...app, iconHTML: renderAppIcon(app).innerHTML }));
             function renderHomeScreen() {
+                queueMicrotask(() => window.dispatchEvent(new Event("simulator-apps-changed")));
                 const gridContainer = document.querySelector(".app-grid-container");
                 const dock = document.querySelector(".dock");
                 if (!gridContainer || !dock) return;

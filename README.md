@@ -28,6 +28,11 @@ mot de passe fictif (non conservé). Le menu Apple Intelligence et Siri propose
 les préférences de langue, voix, réponses et ChatGPT, sans appeler ces services.
 
 Les barres de navigation et les boutons utilisent un effet Liquid Glass sombre.
+Le menu Apps partage la liste et les icônes de l’accueil. Les installations et
+modifications sont reflétées via les événements du simulateur ;
+`window.updateSimulatorApp(id, { name, iconURL, version })` met à jour les deux
+interfaces. Les icônes distantes doivent avoir une URL HTTP(S). Il ne s’agit pas
+d’une synchronisation avec les mises à jour du véritable App Store Apple.
 Les choix ouvrent des listes avec une coche, utilisables au clavier. Les options
 de contraste et de réduction de transparence sont respectées dans ces menus.
 Le Wi-Fi permet de mémoriser ou oublier un réseau, créer un réseau personnalisé,
@@ -42,6 +47,13 @@ Les menus s’appuient sur les guides Apple [Mise à jour iOS](https://support.a
 et [Réglages Wi-Fi](https://support.apple.com/fr-fr/guide/iphone/iphw5gjwl8k2/ios) ;
 le visuel reste une interprétation web.
 
+## Capturer un véritable simulateur iOS
+
+Le workflow manuel et ses scripts sont décrits dans
+[scripts/ios-reference/README.md](scripts/ios-reference/README.md).
+Leur publication sur une branche ne lance pas de session. Le premier lancement
+macOS, la compilation Xcode et les captures natives restent à valider après accord.
+
 Ce projet est une simulation web indépendante, pas un environnement d’exécution
 iOS. Les réseaux, accessoires, informations matérielles et comptes présentés sont
 des démonstrations. Les autres options mémorisent des préférences simulées ; elles
@@ -54,5 +66,6 @@ Ouvrir `index.html` ou servir ce dossier comme site statique. Conserver
 
 Tests navigateur : avec Playwright installé, exécuter `node tests/settings.cjs`
 ainsi que `node tests/dark-apps.cjs` et `node tests/update-system.cjs`.
+`node tests/apps-live.cjs` vérifie les icônes et les mises à jour de la liste Apps.
 La variable `CHROME_PATH` permet d’utiliser un
 Chrome installé. Les cartes nécessitent l’accès à leur dépendance Leaflet externe.
