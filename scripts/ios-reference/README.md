@@ -21,5 +21,9 @@ Après accord : installer ce workflow et son dossier de scripts sur la branche
 par défaut, puis déclencher **Capturer les vrais Réglages iOS** dans Actions.
 La création de fichiers sur une branche ne lance aucune machine.
 
-Validation locale Windows : syntaxe Python uniquement. La compilation Swift,
-le projet Xcode et les captures restent à valider lors du premier lancement macOS.
+Première exécution macOS validée le 17 octobre 2026 : iPhone 16 Pro Max,
+iOS 18.6, compilation Swift et tests natifs réussis. Deux tests ont réussi et
+deux ont été ignorés : Wi-Fi et Mise à jour logicielle ne sont pas présents dans
+le runtime testé. [Résultats](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39062276956).
+L’attente du chargement de la liste Apps a ensuite été renforcée ; cette dernière
+modification n’a pas déclenché une nouvelle session cloud.
