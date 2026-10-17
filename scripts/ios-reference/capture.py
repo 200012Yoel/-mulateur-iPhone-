@@ -50,6 +50,7 @@ def main():
                 "-scheme", "Reference", "-destination", f"platform=iOS Simulator,id={device}",
                 "-parallel-testing-enabled", "NO", "-maximum-concurrent-test-simulator-destinations", "1",
                 "-resultBundlePath", str(OUT / "Reference.xcresult"), "CODE_SIGNING_ALLOWED=NO",
+                *(["-only-testing:ReferenceUITests/SettingsReference/testShortcutsDetailed", "-only-testing:ReferenceUITests/SettingsReference/testAppleIntelligenceAvailability", "-only-testing:ReferenceUITests/SettingsReference/testUpdates"] if os.environ.get("CAPTURE_SCOPE") == "shortcuts" else []),
                 stdout=log, stderr=subprocess.STDOUT)
     finally:
         # Preserve evidence even when a menu or test is unavailable on this runtime.

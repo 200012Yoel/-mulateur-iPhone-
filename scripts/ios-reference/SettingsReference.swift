@@ -87,6 +87,40 @@ final class SettingsReference: XCTestCase {
             if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app) }
         }
     }
+    func testShortcutsDetailed() throws {
+        guard ReferenceCapabilities.shortcuts else { throw XCTSkip("Raccourcis absent") }
+        let app = XCUIApplication(bundleIdentifier: "com.apple.shortcuts")
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        capture("sc-01-library", app: app)
+        let search = app.searchFields.firstMatch
+        if search.exists { search.tap(); search.typeText("Apple Intelligence"); capture("sc-02-search-intelligence", app: app); search.clearAndEnterText("") }
+        app.terminate(); app.launch()
+        let add = app.buttons["ajouter"].firstMatch
+        if add.waitForExistence(timeout: 8) {
+            add.tap(); capture("sc-03-editor", app: app)
+            let actionSearch = app.searchFields.firstMatch
+            if actionSearch.waitForExistence(timeout: 5) {
+                for (index, query) in ["Texte", "Utiliser un modèle", "Résumer", "Apple Intelligence", "Wi-Fi"].enumerated() {
+                    actionSearch.clearAndEnterText(query)
+                    capture("sc-search-" + String(index) + "-" + query, app: app)
+                }
+            }
+            app.swipeUp(); capture("sc-04-editor-lower", app: app)
+        }
+        app.terminate(); app.launch()
+        for (label, name) in [("Automatisation", "sc-05-automation"), ("Galerie", "sc-06-gallery")] {
+            let tab = app.tabBars.buttons[label]
+            if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app); app.swipeUp(); capture(name + "-lower", app: app) }
+        }
+    }
+    func testAppleIntelligenceAvailability() throws {
+        try open(["Apple Intelligence et Siri", "Apple Intelligence & Siri"])
+        capture("sc-07-intelligence-settings")
+        settings.swipeUp(); capture("sc-08-intelligence-settings-lower")
+        // Availability is observed; a missing native model is never represented as enabled.
+    }
     func captureInstalled(_ installed: Bool, bundle: String, name: String) throws {
         guard installed else { throw XCTSkip(name + " non installé dans ce runtime") }
         let app = XCUIApplication(bundleIdentifier: bundle)
@@ -115,5 +149,15 @@ final class SettingsReference: XCTestCase {
         let top = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.04))
         middle.press(forDuration: 0.1, thenDragTo: top)
         capture("19-switcher-dismiss-gesture", app: springboard)
+    }
+}
+
+extension XCUIElement {
+    func clearAndEnterText(_ text: String) {
+        tap()
+        if let value = value as? String, value != placeholderValue {
+            typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: value.count))
+        }
+        if !text.isEmpty { typeText(text) }
     }
 }

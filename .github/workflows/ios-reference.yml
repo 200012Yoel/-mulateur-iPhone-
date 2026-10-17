@@ -6,6 +6,11 @@ on:
         description: Version majeure déjà installée sur le runner (26, 18 ou auto)
         default: '26'
         required: true
+      scope:
+        description: Écrans à capturer
+        type: choice
+        options: [all, shortcuts]
+        default: all
 permissions:
   contents: read
 jobs:
@@ -17,6 +22,7 @@ jobs:
       - name: Démarrer le simulateur et capturer Réglages
         env:
           IOS_MAJOR: ${{ inputs.ios_major }}
+          CAPTURE_SCOPE: ${{ inputs.scope }}
         run: python3 scripts/ios-reference/capture.py
       - name: Conserver les captures et diagnostics
         if: always()
