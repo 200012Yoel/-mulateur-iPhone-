@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Simulateur iPhone</title>
     <link rel="stylesheet" href="settings-simulator.css">
+    <link rel="stylesheet" href="dark-theme.css">
+    <script defer src="dark-theme.js"></script>
     <script defer src="settings-simulator.js"></script>
     <style>
         body {
@@ -22575,14 +22577,10 @@ var youtubeTemplate = `
                             appBackgroundColor = "#f2f2f7";
                             break;
                         case "intelligence":
+                            appSpecificClass = "settings-active";
                             appHeaderContent = "";
-                            appMainContentHTML = APP_TEMPLATES.intelligence;
-                            appBackgroundColor = "black";
-                            appSpecificClass = "intelligence-active";
-                            const glow = document.querySelector(".intelligence-glow-overlay");
-                            if (glow) {
-                                glow.classList.add("active");
-                            }
+                            appMainContentHTML = APP_TEMPLATES.settings;
+                            appBackgroundColor = "#000";
                             break;
                         default:
                             const isAIApp = ["chatgpt", "mistral", "claude", "gemini", "perplexity"].includes(appId);
@@ -22750,8 +22748,8 @@ var youtubeTemplate = `
                     if (appSpecificClass) {
                         appView.classList.add(appSpecificClass);
                     }
-                    if (appId === "settings") {
-                        window.setupSettingsSimulator(appMainContent);
+                    if (appId === "settings" || appId === "intelligence") {
+                        window.setupSettingsSimulator(appMainContent, appId === "intelligence" ? "Apple Intelligence et Siri" : undefined);
                     }
                     if (appId === "phone") {
                         const cur = window.getCurrentCall ? window.getCurrentCall() : null;
@@ -26652,12 +26650,11 @@ var youtubeTemplate = `
                     const wifiSettingsBtn = document.getElementById("wifi-menu-settings-btn-row");
                     if (wifiSettingsBtn) {
                         wifiSettingsBtn.addEventListener("click", () => {
-                            const pageSettings = document.getElementById("page-wifi-settings");
-                            if (pageSettings) {
-                                pageSettings.classList.add("show");
-                                pageSettings.scrollTop = 0;
-                                renderSettingsWifiLists();
-                            }
+                            hideWifiNetworksMenu();
+                            if (window.closeControlCenter) window.closeControlCenter();
+                            window.openApp("settings");
+                            const content = document.querySelector("#generic-app-view .app-main-content");
+                            if (content) window.setupSettingsSimulator(content, "Wi-Fi");
                         });
                     }
 

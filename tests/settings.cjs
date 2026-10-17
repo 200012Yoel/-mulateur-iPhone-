@@ -13,7 +13,7 @@ const {chromium}=require('playwright');
  const names=await root.locator('.row-label').allTextContents();
  for(const name of names){if(name==='Mode Avion')continue; await root.locator('.settings-row').filter({has:page.getByText(name,{exact:true})}).click();assert(await root.locator('.sim-nav').count(),name);await root.locator('[data-back]').click()}
  await root.locator('.settings-row').filter({has:page.getByText('Wi-Fi',{exact:true})}).click();
- await root.getByRole('button',{name:'Maison',exact:true}).click();
+ await root.getByRole('button',{name:'Informations sur Maison',exact:true}).click();
  await root.getByRole('combobox',{name:'Configurer le DNS'}).selectOption('Manuel');
  await root.getByRole('button',{name:'Se connecter à ce réseau',exact:true}).click();
  assert.match(await root.innerText(),/Connexion simulée enregistrée/);

@@ -1,0 +1,48 @@
+/* Dark surfaces without inverting photographs, videos, maps or app icons. */
+html{color-scheme:dark}
+html body{background:#303034!important;color:#f5f5f7}
+.app-view,.app-view .app-main-content,.app-header-container{background-color:#000!important;color:#f5f5f7!important}
+.app-view .night-surface{background-color:#1c1c1e!important;background-image:none!important;border-color:#38383a!important}
+.app-view .night-ink{color:#f2f2f7!important}
+.app-view input,.app-view textarea,.app-view select{color-scheme:dark}
+.app-view input::placeholder,.app-view textarea::placeholder{color:#98989f!important}
+.app-view :is(h1,h2,h3,h4){color:#f5f5f7!important}
+.iphone-screen .status-bar,.status-bar-dark{color:#fff!important}
+.settings-active .app-main-content{background:#000!important;color:#f5f5f7!important}
+.settings-active .settings-group,.settings-active .profile-card{background:#1c1c1e!important}
+.settings-active .settings-group>.settings-row{min-height:50px;padding:8px 14px;box-sizing:border-box}
+.settings-active .settings-group>.settings-row:not(:last-child)::after{background:#38383a}
+.settings-active .toggle{background:#39393d!important}
+.settings-active .toggle.on{background:#30d158!important}
+.settings-active .sim-home-value{color:#98989f;font-size:14px;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.settings-active .row-label,.settings-active .profile-name{color:#fff!important}
+.settings-active .sim-nav{background:#000e;color:#fff}
+.settings-active .sim-row{color:#f5f5f7}
+.settings-active .sim-group{background:#1c1c1e}
+.settings-active .sim-note,.settings-active .sim-value{color:#a0a0a8}
+.settings-active .sim-row+.sim-row:before{border-color:#38383a}
+.settings-active .sim-link,.settings-active .sim-nav button{color:#0a84ff}
+.settings-active .sim-search{background:#1c1c1e;color:#fff}
+.settings-active .sim-row select,.settings-active .sim-row input[type=text]{color:#aaaab2}
+.settings-active .sim-row input[type=checkbox]{background:#39393d}
+.settings-active .sim-row input[type=checkbox]:checked{background:#30d158}
+.settings-active .sim-page-title{margin:12px 0 24px;font-size:34px;letter-spacing:-1px}
+.settings-active .sim-section-label{color:#98989f!important;font-size:13px;font-weight:400;text-transform:uppercase;margin:28px 16px 10px;display:flex;align-items:center;gap:10px}
+.sim-network{min-height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;position:relative}
+.sim-network+.sim-network:before{content:'';position:absolute;left:16px;right:0;top:0;border-top:1px solid #38383a}
+.sim-network button{font:inherit;background:none;border:0;cursor:pointer}
+.sim-network-name{flex:1;color:#fff;text-align:left;display:flex;align-items:center;gap:9px;padding:16px 0}
+.sim-check{color:#0a84ff}
+.sim-signal{display:flex;align-items:center;gap:9px;color:#eee;font-size:12px}
+.sim-network .sim-info{border:1.5px solid #0a84ff;color:#0a84ff;width:22px;height:22px;border-radius:50%;font-weight:600;font-family:Georgia,serif;font-size:16px;padding:0}
+.sim-spaced{margin-top:28px}
+.sim-join{position:absolute;inset:0;background:#000;z-index:20;padding:40px 16px 24px;box-sizing:border-box}
+.sim-join h2{font-size:22px;line-height:1.3;margin:32px 12px 16px}
+.sim-join input[type=password]{width:52%;min-width:0;border:0;background:transparent;color:white;font:inherit;padding:10px 0}
+.sim-spinner{width:12px;height:12px;border-radius:50%;border:2px dotted #98989f;animation:sim-spin 2s linear infinite}
+@keyframes sim-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.sim-spinner{animation:none}}
+.sim-ai-hero{text-align:center;padding:22px 14px 14px}
+.sim-ai-orb{display:grid;place-items:center;width:76px;height:76px;margin:0 auto 18px;border-radius:24px;background:linear-gradient(140deg,#58a5ff,#a66aee 48%,#f883a8 80%,#ffc77b);color:white;font-size:48px;box-shadow:0 0 35px #9255dd35}
+.sim-ai-hero h2{font-size:28px;line-height:1.12;letter-spacing:-.7px;margin:12px 0}
+.sim-ai-hero p{color:#aaaab2;font-size:14px;line-height:1.45}

@@ -21,7 +21,11 @@ Les 26 rubriques de Réglages ouvrent des sous-menus : Wi-Fi (détails du résea
 IP, DNS, proxy), Bluetooth, Général, accessibilité, affichage, notifications,
 concentration, confidentialité et préférences des applications. Une recherche
 filtre les rubriques. Les choix sont conservés dans le stockage local du navigateur.
-Le thème clair/sombre et le texte gras s’appliquent aux écrans Réglages.
+Le téléphone et les surfaces des applications utilisent un thème sombre ; le fond
+du site est gris. Les photos, vidéos et icônes conservent leurs couleurs.
+Le Wi-Fi propose une liste de réseaux, des boutons d’information et une saisie de
+mot de passe fictif (non conservé). Le menu Apple Intelligence et Siri propose
+les préférences de langue, voix, réponses et ChatGPT, sans appeler ces services.
 
 Ce projet est une simulation web indépendante, pas un environnement d’exécution
 iOS. Les réseaux, accessoires, informations matérielles et comptes présentés sont
@@ -30,4 +34,9 @@ ne modifient pas le matériel, les autorisations du navigateur ou les services A
 La reproduction exacte d’iOS 27 n’a pas été vérifiée sur un appareil de référence.
 
 Ouvrir `index.html` ou servir ce dossier comme site statique. Conserver
-`settings-simulator.js` et `settings-simulator.css` à côté d’`index.html`.
+`settings-simulator.js`, `settings-simulator.css`, `dark-theme.js` et
+`dark-theme.css` à côté d’`index.html`.
+
+Tests navigateur : avec Playwright installé, exécuter `node tests/settings.cjs`
+et `node tests/dark-apps.cjs`. La variable `CHROME_PATH` permet d’utiliser un
+Chrome installé. Les cartes nécessitent l’accès à leur dépendance Leaflet externe.
