@@ -27,6 +27,11 @@ Le Wi-Fi propose une liste de réseaux, des boutons d’information et une saisi
 mot de passe fictif (non conservé). Le menu Apple Intelligence et Siri propose
 les préférences de langue, voix, réponses et ChatGPT, sans appeler ces services.
 
+Batterie dispose d’historiques fictifs sur 24 heures et 10 jours, d’une ventilation
+par app, d’un écran de santé et d’une limite de recharge 80/85/90/95/100 %. La
+recharge optimisée n’est proposée qu’à 100 %. AirDrop possède les trois choix de
+réception et les préférences de partage. Ces fonctions ne pilotent pas de matériel.
+
 Les barres de navigation et les boutons utilisent un effet Liquid Glass sombre.
 Le menu Apps partage la liste et les icônes de l’accueil. Les installations et
 modifications sont reflétées via les événements du simulateur ;
@@ -43,6 +48,9 @@ préparation, installation et état « à jour ». La progression reprend au ret
 dans le menu et son état est conservé après rechargement. Le choix « cette nuit »
 est uniquement mémorisé : aucun travail en arrière-plan n’est programmé. Les
 préférences automatiques et bêta sont des sous-menus distincts.
+L’écran présente iOS 26 et, en dessous, une proposition iOS 27, selon la
+[disposition documentée par Apple](https://support.apple.com/fr-ca/118575).
+Ce ne sont pas des mises à jour réellement proposées par un serveur Apple.
 Les menus s’appuient sur les guides Apple [Mise à jour iOS](https://support.apple.com/fr-fr/guide/iphone/iph3e504502/ios)
 et [Réglages Wi-Fi](https://support.apple.com/fr-fr/guide/iphone/iphw5gjwl8k2/ios) ;
 le visuel reste une interprétation web.
@@ -55,6 +63,22 @@ Leur publication sur une branche ne lance pas de session. Le premier lancement
 macOS a réussi sur iPhone 16 Pro Max / iOS 18.6 :
 [observations et limites](docs/ios-reference/README.md).
 
+## Raccourcis et multitâche
+
+Raccourcis a été réécrit en module séparé : onglets Raccourcis, Automatisation et
+Galerie, création/renommage, sélection/suppression, édition et réorganisation
+de plusieurs actions. L’exécution locale prend en charge l’ouverture d’apps,
+l’affichage de texte, le Wi-Fi et le mode économie d’énergie simulés. Les
+automatisations sont des scénarios testables manuellement, sans tâches natives
+en arrière-plan. Les données `ios_shortcuts` existantes sont conservées et migrées.
+Les centaines d’actions et les services du véritable Raccourcis ne sont pas inclus.
+
+Le sélecteur utilise des aperçus isolés dans des Shadow DOM pour préserver leur
+style sans ajouter d’identifiants en double à la page. Le glissement vers le haut
+ferme une app ; un glissement trop court revient en place. Une app fermée n’est
+plus rouverte par le clic qui suit le geste. Suppr/Retour arrière ferme la carte
+au clavier. Fermer les apps ne supprime pas les données enregistrées.
+
 Ce projet est une simulation web indépendante, pas un environnement d’exécution
 iOS. Les réseaux, accessoires, informations matérielles et comptes présentés sont
 des démonstrations. Les autres options mémorisent des préférences simulées ; elles
@@ -64,9 +88,13 @@ La reproduction exacte d’iOS 27 n’a pas été vérifiée sur un appareil de 
 Ouvrir `index.html` ou servir ce dossier comme site statique. Conserver
 `settings-simulator.js`, `settings-simulator.css`, `dark-theme.js` et
 `dark-theme.css` et `liquid-glass.css` à côté d’`index.html`.
+Conserver également `shortcuts-simulator.js`, `shortcuts-simulator.css` et
+`system-interactions.js` avec les autres fichiers du site.
 
 Tests navigateur : avec Playwright installé, exécuter `node tests/settings.cjs`
 ainsi que `node tests/dark-apps.cjs` et `node tests/update-system.cjs`.
 `node tests/apps-live.cjs` vérifie les icônes et les mises à jour de la liste Apps.
+`node tests/expanded-system.cjs` vérifie Batterie, Recharge, les deux versions de
+mise à jour, AirDrop, Raccourcis multi-actions et la fermeture des applications.
 La variable `CHROME_PATH` permet d’utiliser un
 Chrome installé. Les cartes nécessitent l’accès à leur dépendance Leaflet externe.

@@ -1,0 +1,37 @@
+const assert=require('node:assert/strict');
+const {chromium}=require('playwright');
+(async()=>{
+ const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+ const page=await browser.newPage({viewport:{width:1200,height:1000}}),errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.goto(require('url').pathToFileURL(require('path').resolve('index.html')).href);
+ const root=page.locator('#generic-app-view .app-main-content');
+ const open=app=>page.evaluate(id=>window.openApp(id),app);
+ const settingsRow=name=>root.locator('.settings-row').filter({has:page.getByText(name,{exact:true})});
+ await open('settings');await settingsRow('Batterie').click();
+ assert(await root.getByRole('img',{name:/Historique de batterie/}).count());
+ await root.getByRole('button',{name:'10 derniers jours',exact:true}).click();assert.match(await root.innerText(),/UTILISATION DE LA BATTERIE/);
+ await page.screenshot({path:'scratch/battery-rebuilt.png',animations:'disabled'});
+ await root.getByRole('button',{name:/^Recharge/}).click();await root.getByRole('button',{name:'85 %',exact:true}).click();assert.equal(await root.getByRole('checkbox',{name:'Recharge optimisée de la batterie'}).count(),0);
+ await root.getByRole('button',{name:'100 %',exact:true}).click();assert(await root.getByRole('checkbox',{name:'Recharge optimisée de la batterie'}).isChecked());
+ await page.screenshot({path:'scratch/charging-rebuilt.png',animations:'disabled'});
+ await open('settings');await settingsRow('Général').click();await root.getByRole('button',{name:'Mise à jour logicielle',exact:true}).click();
+ assert(await root.getByRole('heading',{name:'iOS 26',exact:true}).count());assert(await root.getByRole('button',{name:'Mettre à niveau vers iOS 27',exact:true}).count());await page.screenshot({path:'scratch/updates-two-versions.png',animations:'disabled'});
+ await root.getByRole('button',{name:'Mettre à niveau vers iOS 27',exact:true}).click();assert(await root.getByRole('heading',{name:'iOS 27',exact:true}).count());
+ await open('settings');await settingsRow('Général').click();await root.getByRole('button',{name:'AirDrop',exact:true}).click();await root.getByRole('radio',{name:'Réception désactivée',exact:true}).click();assert.equal(await root.getByRole('radio',{name:'Réception désactivée',exact:true}).getAttribute('aria-checked'),'true');
+ await open('shortcuts');await root.locator('[data-create]').click();await root.getByLabel('Nom du raccourci').fill('Routine de test');await root.getByLabel('Nom du raccourci').blur();
+ async function add(type,value){await root.getByRole('button',{name:'＋ Ajouter une action',exact:true}).click();const dialog=root.getByRole('dialog',{name:'Ajouter une action'});await dialog.getByLabel('Type d’action').selectOption(type);if(type==='text')await dialog.getByLabel('Texte à afficher').fill(value);else await dialog.getByLabel('État',{exact:true}).selectOption(value);await dialog.getByRole('button',{name:'Ajouter',exact:true}).click();}
+ await add('wifi','false');await add('text','Bonjour test');assert.equal(await root.locator('.shm-action-list article').count(),2);
+ await root.getByRole('button',{name:'Monter l’action 2',exact:true}).click();assert.match(await root.locator('.shm-action-list article').first().innerText(),/Afficher du texte/);
+ await page.screenshot({path:'scratch/editor-rebuilt.png',animations:'disabled'});await root.getByRole('button',{name:'Exécuter le raccourci',exact:true}).click();assert.match(await root.getByRole('status').innerText(),/Bonjour test/);assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('iphone.settings.v1'))['Wi-Fi/Wi-Fi']),false);
+ await root.getByRole('button',{name:'Terminé',exact:true}).click();await page.screenshot({path:'scratch/shortcuts-rebuilt.png',animations:'disabled'});
+ await root.getByRole('button',{name:'Automatisation',exact:true}).click();await page.screenshot({path:'scratch/automation-rebuilt.png',animations:'disabled'});await root.getByRole('button',{name:'Nouvelle automatisation',exact:true}).click();const form=root.getByRole('dialog',{name:'Nouvelle automatisation'});await form.getByLabel('Événement').selectOption('Chargeur connecté');await form.getByRole('button',{name:'Créer l’automatisation'}).click();assert.match(await root.innerText(),/Chargeur connecté/);
+ await page.reload();await open('shortcuts');assert.match(await root.innerText(),/Routine de test/);await open('clock');await open('settings');await page.evaluate(()=>window.openAppSwitcher());
+ assert.equal(await page.locator('#app-switcher').evaluate(el=>el.classList.contains('active')),true);assert(await page.locator('#card-settings .card-snapshot-wrap').evaluate(el=>Boolean(el.shadowRoot?.querySelector('.app-main-content'))));
+ await page.waitForFunction(()=>{const el=document.querySelector('#card-settings .card-snapshot-wrap')?.shadowRoot?.querySelector('.app-main-content');return el && getComputedStyle(el).backgroundColor.match(/\d+/g).slice(0,3).every(x=>Number(x)<50);});
+ await page.screenshot({path:'scratch/switcher-rebuilt.png',animations:'disabled'});
+ const card=page.locator('#card-settings'),box=await card.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height*.6);await page.mouse.down();await page.mouse.move(box.x+box.width/2,box.y+box.height*.6-25,{steps:4});await page.mouse.up();await page.waitForTimeout(450);assert.equal(await page.evaluate(()=>window.activeApps.includes('settings')),true);await page.mouse.move(box.x+box.width/2,box.y+box.height*.6);await page.mouse.down();await page.mouse.move(box.x+box.width/2,box.y+box.height*.6-190,{steps:8});await page.mouse.up();await page.waitForTimeout(450);
+ assert.equal(await page.evaluate(()=>window.activeApps.includes('settings')),false);assert.equal(await page.evaluate(()=>Boolean(window.appSnapshots.settings)),false);assert.equal(await page.locator('#generic-app-view').evaluate(el=>el.classList.contains('active')),false);
+ await page.locator('#card-clock').press('Delete');await page.waitForTimeout(350);await page.locator('#card-shortcuts').press('Delete');await page.waitForTimeout(350);assert.equal(await page.locator('#app-switcher').evaluate(el=>el.classList.contains('active')),false);await open('shortcuts');assert.match(await root.innerText(),/Routine de test/);
+ assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: Batterie, recharge 85/100 %, iOS 26/27, AirDrop, raccourcis multi-actions, ordre/exécution/persistance, automatisation et fermeture par glissement sans réouverture.');await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="settings-simulator.css">
     <link rel="stylesheet" href="dark-theme.css">
     <link rel="stylesheet" href="liquid-glass.css">
+    <link rel="stylesheet" href="shortcuts-simulator.css">
+    <script defer src="shortcuts-simulator.js"></script>
+    <script defer src="system-interactions.js"></script>
     <script defer src="dark-theme.js"></script>
     <script defer src="settings-simulator.js"></script>
     <style>
@@ -15859,489 +15862,7 @@ var youtubeTemplate = `
 `;
 
             // js/apps/templates/shortcuts.js
-            var shortcutsTemplate = `
-<style>
-  /* Shortcuts App - Action Picker & Editor Sheet Styles */
-  .shortcuts-app-container {
-    padding-top: 54px;
-    box-sizing: border-box;
-    height: 100%;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-  .sh-editor-screen {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #000;
-    z-index: 100;
-    display: none;
-    overflow: hidden;
-  }
-  .sh-editor-screen.active {
-    display: block;
-  }
-  .sh-editor-screen .editor {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #000;
-    z-index: 1;
-  }
-  .sh-editor-screen .editor-nav {
-    position: absolute;
-    top: 54px; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 0 16px;
-    z-index: 2;
-  }
-  .sh-editor-screen .back-btn {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: rgba(118,118,128,.28);
-    display: flex; align-items: center; justify-content: center;
-    flex: 0 0 auto;
-    cursor: pointer;
-  }
-  .sh-editor-screen .editor-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-  }
-  .sh-editor-screen .editor-icon {
-    width: 34px; height: 34px;
-    border-radius: 9px;
-    background: linear-gradient(160deg,#5ee6b0,#1fb37a);
-    display: flex; align-items: center; justify-content: center;
-    flex: 0 0 auto;
-  }
-  .sh-editor-screen .editor-name {
-    color: #fff;
-    font-size: 22px;
-    font-weight: 700;
-  }
-  .sh-editor-screen .editor-chevron {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: rgba(118,118,128,.28);
-    display: flex; align-items: center; justify-content: center;
-    flex: 0 0 auto;
-  }
-  .sh-editor-screen .editor-empty {
-    position: absolute;
-    top: 170px; left: 16px; right: 16px;
-    text-align: center;
-    color: rgba(235,235,245,.55);
-    font-size: 20px;
-    line-height: 1.35;
-    font-weight: 500;
-    padding: 0 20px;
-  }
-  .sh-editor-screen .sh-added-actions-list {
-    position: absolute;
-    top: 140px; left: 16px; right: 16px; bottom: 120px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 2;
-  }
-  .sh-editor-screen .sh-added-action-card {
-    background: rgba(118,118,128,.24);
-    border-radius: 14px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  /* Draggable Sheet */
-  .sh-editor-screen .sheet {
-    position: absolute;
-    top: 64px;
-    left: 0; right: 0; bottom: 0;
-    background: #1c1c1e;
-    border-radius: 38px 38px 0 0;
-    box-shadow: 0 -10px 40px rgba(0,0,0,.5);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 10;
-    transition: top .32s cubic-bezier(.32,.72,0,1), bottom .32s cubic-bezier(.32,.72,0,1), border-radius .32s cubic-bezier(.32,.72,0,1);
-    touch-action: none;
-  }
-  .sh-editor-screen .sheet.dragging { transition: none; }
-  .sh-editor-screen .sheet.collapsed .chips,
-  .sh-editor-screen .sheet.collapsed .list { display: none; }
-  .sh-editor-screen .sheet .toolbar { display: none; }
-  .sh-editor-screen .sheet.collapsed .toolbar { display: flex; }
-
-  .sh-editor-screen .grabber-zone {
-    flex: 0 0 auto;
-    padding: 6px 0 2px;
-    display: flex;
-    justify-content: center;
-    cursor: grab;
-  }
-  .sh-editor-screen .grabber {
-    width: 36px; height: 5px;
-    background: rgba(255,255,255,.35);
-    border-radius: 3px;
-  }
-
-  .sh-editor-screen .toolbar {
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 34px 8px;
-    flex: 0 0 auto;
-  }
-  .sh-editor-screen .toolbar button {
-    background: none;
-    border: none;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(235,235,245,.45);
-    cursor: pointer;
-  }
-  .sh-editor-screen .toolbar .run-btn {
-    width: 34px; height: 34px;
-    border-radius: 9px;
-    background: rgba(118,118,128,.24);
-    color: rgba(235,235,245,.4);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-
-  .sh-editor-screen .search-wrap { padding: 2px 16px 2px; flex: 0 0 auto; }
-  .sh-editor-screen .search-bar {
-    background: rgba(118,118,128,.24);
-    border-radius: 11px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    padding: 0 8px;
-    gap: 6px;
-  }
-  .sh-editor-screen .search-bar svg { flex: 0 0 auto; opacity: .65; }
-  .sh-editor-screen .search-input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #fff;
-    font-size: 16.5px;
-    flex: 1;
-    caret-color: #0a84ff;
-  }
-  .sh-editor-screen .search-input::placeholder { color: rgba(235,235,245,.6); }
-  .sh-editor-screen .mic-btn { flex: 0 0 auto; opacity: .75; display: flex; }
-
-  .sh-editor-screen .chips {
-    display: flex;
-    gap: 8px;
-    padding: 2px 16px 12px;
-    flex: 0 0 auto;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .sh-editor-screen .chips::-webkit-scrollbar { display: none; }
-  .sh-editor-screen .chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    background: rgba(10,132,255,.16);
-    color: #0a84ff;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 6px 14px 6px 12px;
-    border-radius: 16px;
-    flex: 0 0 auto;
-  }
-  .sh-editor-screen .chip svg { flex: 0 0 auto; }
-
-  .sh-editor-screen .list {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 30px;
-  }
-  .sh-editor-screen .list::-webkit-scrollbar { width: 4px; }
-  .sh-editor-screen .list::-webkit-scrollbar-thumb { background: rgba(235,235,245,.3); border-radius: 2px; }
-
-  .sh-editor-screen .section-header {
-    color: rgba(235,235,245,.6);
-    font-size: 13px;
-    font-weight: 400;
-    padding: 14px 16px 6px;
-  }
-
-  .sh-editor-screen .action-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 0 16px 10px;
-    background: rgba(118,118,128,.24);
-    border-radius: 12px;
-    padding: 10px 14px;
-    cursor: pointer;
-  }
-  .sh-editor-screen .action-icon {
-    width: 30px; height: 30px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    flex: 0 0 auto;
-  }
-  .sh-editor-screen .action-label { color: #fff; font-size: 17px; flex: 1; }
-  .sh-editor-screen .info-dot {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: rgba(118,118,128,.35);
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(235,235,245,.6);
-    font-size: 13px;
-    font-style: italic;
-    font-family: Georgia, serif;
-    flex: 0 0 auto;
-  }
-
-  .sh-editor-screen .app-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 10px 16px;
-    position: relative;
-    cursor: pointer;
-  }
-  .sh-editor-screen .app-row::after {
-    content: "";
-    position: absolute;
-    left: 76px; right: 16px; bottom: 0;
-    height: 0.5px;
-    background: rgba(84,84,88,.65);
-  }
-  .sh-editor-screen .app-row:last-child::after { display: none; }
-
-  .sh-editor-screen .app-icon {
-    width: 56px; height: 56px;
-    border-radius: 13px;
-    flex: 0 0 auto;
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .sh-editor-screen .app-name {
-    color: #fff;
-    font-size: 19px;
-    font-weight: 600;
-    flex: 1;
-  }
-
-  .sh-editor-screen .sheen::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 55%;
-    background: linear-gradient(to bottom, rgba(255,255,255,.35), rgba(255,255,255,0));
-    border-radius: 13px 13px 50% 50%/13px 13px 20px 20px;
-  }
-  .sh-editor-screen .hidden { display: none !important; }
-  .sh-editor-screen .empty-state {
-    text-align: center;
-    color: rgba(235,235,245,.5);
-    font-size: 15px;
-    padding: 60px 20px;
-  }
-</style>
-
-<div class="shortcuts-app-container">
-    <!-- Interface 1: Tous les raccourcis -->
-    <div id="view-shortcuts">
-        <div class="top-bar">
-            <button class="select-pill-btn" id="sh-select-btn">Sélectionner</button>
-        </div>
-
-        <h1 class="screen-title">Tous les raccourcis</h1>
-
-        <div class="search-box">
-            <span class="icon-search-left">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </span>
-            <input type="text" class="search-input" placeholder="Recherche" id="sh-search-input">
-            <span class="icon-mic-right">
-                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.67V21h2v-3.33c3.28-.47 6-3.25 6-6.67h-1.7z"/>
-                </svg>
-            </span>
-        </div>
-
-        <!-- Central empty state if all shortcuts are deleted -->
-        <div class="main-empty-state" id="sh-empty-state">
-            <svg class="shortcut-layers-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m11.142 0L21.75 12l-4.179-2.25M12 5.75L6.429 8.75 12 11.75l5.571-3L12 5.75zm0 12.5l-5.571-3L12 18.25l5.571-3-5.571 3z" />
-            </svg>
-            <div class="empty-label">Aucun raccourci</div>
-        </div>
-
-        <!-- Dossiers Section -->
-        <div class="section-divider">
-            <div class="section-row-header">
-                <div class="section-row-title">
-                    <svg class="blue-folder-icon" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                    </svg>
-                    Raccourcis pour débuter
-                </div>
-                <div class="blue-plus-action" id="sh-add-plus-btn">+</div>
-            </div>
-            <div class="folder-dashed-box" id="sh-folder-box">
-                <div class="box-primary-text">Aucun raccourci</div>
-                <div class="box-secondary-text">Les raccourcis ajoutés à<br>« Raccourcis pour débuter »<br>apparaîtront ici.</div>
-            </div>
-        </div>
-
-        <!-- Franceinfo brand header -->
-        <div class="app-brand-header">
-            <div class="fi-mini-logo">
-                <div class="fi-dot"></div>
-                <div class="fi-dot"></div>
-            </div>
-            franceinfo
-            <span class="fi-chevron-right">&#8250;</span>
-        </div>
-
-        <!-- Dynamic grid of shortcuts -->
-        <div class="grid-layout" id="sh-shortcuts-grid">
-            <!-- Rendered by handler -->
-        </div>
-    </div>
-
-    <!-- Floating bottom bar -->
-    <div class="bottom-action-area" id="sh-floating-bar">
-        <button class="ios-pill-btn" id="sh-new-shortcut-btn">
-            <span style="font-size: 20px; font-weight: 300; margin-top: -2px;">+</span> Nouveau raccourci
-        </button>
-    </div>
-
-    <!-- Interface 2: Action Editor & Picker Screen -->
-    <div class="sh-editor-screen" id="sh-editor-view">
-        <!-- Editor background screen -->
-        <div class="editor">
-            <div class="editor-nav">
-                <div class="back-btn" id="sh-editor-back">
-                    <svg width="12" height="20" viewBox="0 0 12 20" fill="none"><path d="M10 1L2 10l8 9" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div class="editor-title">
-                    <div class="editor-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L3 7v5c0 5 4 9 9 10 5-1 9-5 9-10V7l-9-5z"/></svg>
-                    </div>
-                    <div class="editor-name" id="sh-editor-title-text">Nouv. raccourci 1</div>
-                    <div class="editor-chevron">
-                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </div>
-                </div>
-            </div>
-            <div class="editor-empty" id="sh-editor-empty">Ajoutez des actions depuis la liste ci-dessous pour créer un raccourci.</div>
-            <div class="sh-added-actions-list" id="sh-added-actions-list"></div>
-        </div>
-
-        <!-- Draggable Action Sheet -->
-        <div class="sheet" id="sh-action-sheet">
-            <div class="grabber-zone" id="shGrabberZone">
-                <div class="grabber"></div>
-            </div>
-
-            <div class="search-wrap">
-                <div class="search-bar">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <circle cx="7" cy="7" r="5.5" stroke="#EBEBF5" stroke-width="1.6"/>
-                        <line x1="11" y1="11" x2="15" y2="15" stroke="#EBEBF5" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-                    <input class="search-input" id="shSearchInput" type="text" placeholder="Search" autocomplete="off">
-                    <span class="mic-btn">
-                        <svg width="15" height="18" viewBox="0 0 15 18" fill="none">
-                            <rect x="4.5" y="0.5" width="6" height="10" rx="3" stroke="#EBEBF5" stroke-width="1.3"/>
-                            <path d="M1 8.5C1 12 3.5 14.5 7.5 14.5C11.5 14.5 14 12 14 8.5" stroke="#EBEBF5" stroke-width="1.3" stroke-linecap="round"/>
-                            <line x1="7.5" y1="14.5" x2="7.5" y2="17.5" stroke="#EBEBF5" stroke-width="1.3" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                </div>
-            </div>
-
-            <div class="chips">
-                <div class="chip">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6.5" stroke="#0a84ff" stroke-width="1.3"/><path d="M7.5 4V7.5L10 9" stroke="#0a84ff" stroke-width="1.3" stroke-linecap="round"/></svg>
-                    Automatisation
-                </div>
-                <div class="chip">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 13L13 2M2 2L13 13" stroke="#0a84ff" stroke-width="1.3" stroke-linecap="round" transform="rotate(45 7.5 7.5)"/></svg>
-                    Scripts
-                </div>
-                <div class="chip">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="3" width="13" height="4" rx="1.5" stroke="#0a84ff" stroke-width="1.2"/><rect x="1" y="9" width="13" height="4" rx="1.5" stroke="#0a84ff" stroke-width="1.2"/></svg>
-                    Commandes
-                </div>
-            </div>
-
-            <div class="list" id="shActionList">
-                <div id="shActionsGroup">
-                    <div class="action-row" data-action="message">
-                        <div class="action-icon" style="background:#30d158;">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
-                        </div>
-                        <div class="action-label">Envoyer un message</div>
-                        <div class="info-dot">i</div>
-                    </div>
-                    <div class="action-row" data-action="app">
-                        <div class="action-icon" style="background:#5e5ce6;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
-                        </div>
-                        <div class="action-label">Ouvrir l'app</div>
-                        <div class="info-dot">i</div>
-                    </div>
-                    <div class="action-row" data-action="music">
-                        <div class="action-icon" style="background:#fa2d48;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                        </div>
-                        <div class="action-label">Lire la musique</div>
-                        <div class="info-dot">i</div>
-                    </div>
-                </div>
-
-                <div id="shAppsGroup"></div>
-                <div class="empty-state hidden" id="shSheetEmptyState">Aucun résultat</div>
-            </div>
-
-            <div class="toolbar" id="shToolbar">
-                <button title="Annuler">
-                    <svg width="22" height="18" viewBox="0 0 22 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2L1 8l6 6"/><path d="M1 8h12a7 7 0 0 1 0 14h-2"/></svg>
-                </button>
-                <button title="Rétablir">
-                    <svg width="22" height="18" viewBox="0 0 22 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2l6 6-6 6"/><path d="M21 8H9a7 7 0 0 0 0 14h2"/></svg>
-                </button>
-                <button title="Info">
-                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="13" cy="13" r="11.5"/><circle cx="13" cy="8.3" r="1.1" fill="currentColor" stroke="none"/><path d="M13 12v6.5" stroke-linecap="round"/></svg>
-                </button>
-                <button title="Partager">
-                    <svg width="20" height="22" viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 1v13"/><path d="M5.5 5.5L10 1l4.5 4.5"/><path d="M1 13v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6"/></svg>
-                </button>
-                <div class="run-btn" id="shRunBtn" title="Exécuter">
-                    <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor"><path d="M0 0l14 8-14 8z"/></svg>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-`;
+            var shortcutsTemplate = '<div class="shortcuts-app-container"></div>';
 
             // js/audio-engine.js
             window.AudioEngine = {
@@ -22012,420 +21533,6 @@ var youtubeTemplate = `
             }
 
             // js/apps/handlers/shortcuts.js
-            function setupShortcutsApp() {
-                const container = document.querySelector(".shortcuts-app-container");
-                if (!container) return;
-
-                const viewShortcuts = container.querySelector("#view-shortcuts");
-                const floatingBar = container.querySelector("#sh-floating-bar");
-                const searchInput = container.querySelector("#sh-search-input");
-                const shortcutsGrid = container.querySelector("#sh-shortcuts-grid");
-                const emptyState = container.querySelector("#sh-empty-state");
-                const folderBox = container.querySelector("#sh-folder-box");
-                const addPlusBtn = container.querySelector("#sh-add-plus-btn");
-                const newShortcutBtn = container.querySelector("#sh-new-shortcut-btn");
-
-                const editorScreen = container.querySelector("#sh-editor-view");
-                const editorBackBtn = container.querySelector("#sh-editor-back");
-                const editorTitleText = container.querySelector("#sh-editor-title-text");
-                const editorEmpty = container.querySelector("#sh-editor-empty");
-                const addedActionsList = container.querySelector("#sh-added-actions-list");
-
-                const sheet = container.querySelector("#sh-action-sheet");
-                const grabberZone = container.querySelector("#shGrabberZone");
-                const shSearchInput = container.querySelector("#shSearchInput");
-                const shActionsGroup = container.querySelector("#shActionsGroup");
-                const shAppsGroup = container.querySelector("#shAppsGroup");
-                const shSheetEmptyState = container.querySelector("#shSheetEmptyState");
-                const shRunBtn = container.querySelector("#shRunBtn");
-
-                let shortcuts = [];
-                let currentEditingShortcut = null;
-
-                const pickerApps = [
-                    {name:"Amazon", bg:"linear-gradient(160deg,#2b2b2b,#111)", glyph:"amazon", appId:"amazon"},
-                    {name:"App Store", bg:"linear-gradient(160deg,#38b0ff,#0a6fd8)", glyph:"appstore", appId:"appstore"},
-                    {name:"Bonjour RATP", bg:"#1c1470", glyph:"ratp", appId:"ratp"},
-                    {name:"Bourse", bg:"#000", glyph:"stocks", appId:"stocks"},
-                    {name:"Calculatrice", bg:"linear-gradient(160deg,#3a3a3c,#1c1c1e)", glyph:"calc", appId:"calc"},
-                    {name:"Calendrier", bg:"#fff", glyph:"calendar", appId:"calendar"},
-                    {name:"Caméra", bg:"linear-gradient(160deg,#3a3a3c,#111)", glyph:"camera", appId:"camera"},
-                    {name:"Cartes", bg:"linear-gradient(160deg,#ffd28c,#ff9f43)", glyph:"wallet", appId:"wallet"},
-                    {name:"ChatGPT", bg:"#fff", glyph:"chatgpt", appId:"chatgpt"},
-                    {name:"Chrome", bg:"#fff", glyph:"chrome", appId:"chrome"},
-                    {name:"Claude", bg:"#da7756", glyph:"claude", appId:"claude"},
-                    {name:"Contacts", bg:"linear-gradient(160deg,#f2f2f7,#d8d8de)", glyph:"contacts", appId:"contacts"},
-                    {name:"Copilot", bg:"#fff", glyph:"copilot", appId:"copilot"},
-                    {name:"Dictaphone", bg:"#000", glyph:"voicememo", appId:"voicememo"},
-                    {name:"Discord", bg:"#5865F2", glyph:"discord", appId:"discord"},
-                    {name:"Eris.", bg:"#000", glyph:"moon", appId:"moon"},
-                    {name:"FaceTime", bg:"linear-gradient(160deg,#63e070,#2bb844)", glyph:"facetime", appId:"facetime"},
-                    {name:"Fichiers", bg:"#fff", glyph:"files", appId:"files"},
-                    {name:"Fitness", bg:"#000", glyph:"fitness", appId:"fitness"},
-                    {name:"franceinfo", bg:"#111", glyph:"franceinfo", appId:"franceinfo"},
-                    {name:"Freeform", bg:"linear-gradient(160deg,#1a3f4a,#0d232b)", glyph:"freeform", appId:"freeform"},
-                    {name:"Gemini", bg:"#fff", glyph:"gemini", appId:"gemini"},
-                    {name:"Gmail", bg:"#fff", glyph:"gmail", appId:"gmail"},
-                    {name:"Google", bg:"#fff", glyph:"google", appId:"google"},
-                    {name:"Suno", bg:"linear-gradient(135deg,#ff8a3d,#ff5e8f 40%,#7c4dff)", glyph:"suno", appId:"suno"},
-                    {name:"Téléphone", bg:"linear-gradient(160deg,#6ee06e,#2bb844)", glyph:"phone", appId:"phone"},
-                    {name:"TikTok", bg:"#000", glyph:"tiktok", appId:"tiktok"},
-                    {name:"Traduire", bg:"linear-gradient(160deg,#5ad1e6,#2a9fc9)", glyph:"translate", appId:"translate"},
-                    {name:"WA Business", bg:"linear-gradient(160deg,#6ee06e,#2bb844)", glyph:"wabiz", appId:"wabiz"},
-                    {name:"Watch", bg:"#1c1c1e", glyph:"watch", appId:"watch"},
-                    {name:"WhatsApp", bg:"linear-gradient(160deg,#6ee06e,#2bb844)", glyph:"whatsapp", appId:"whatsapp"},
-                    {name:"X", bg:"#000", glyph:"x", appId:"x"}
-                ];
-
-                function renderGlyph(type){
-                    switch(type){
-                        case "amazon": return `<svg width="30" height="30" viewBox="0 0 30 30"><text x="15" y="14" font-size="9" fill="#fff" text-anchor="middle" font-family="Arial" font-weight="bold">amazon</text><path d="M6 19c5 4 13 4 18 0" stroke="#ff9900" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M22 17l3-1-1 3" stroke="#ff9900" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-                        case "appstore": return `<svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 20h20L12 2z" opacity="0"/><path d="M12 3l8.5 15H3.5L12 3z" fill="none"/><path d="M9 8l3-4 3 4M12 4v10M6 20l3-5M18 20l-3-5M9 15h6l-1.5 3h-3z" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-                        case "ratp": return `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4"><path d="M12 3c-4 0-6 3-6 6 0 5 6 12 6 12s6-7 6-12c0-3-2-6-6-6z"/><path d="M8 9c1.5 1.5 6.5 1.5 8 0"/></svg>`;
-                        case "stocks": return `<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M2 17l5-6 4 3 6-8 5 4" stroke="#0a84ff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="14" r="1" fill="#0a84ff"/></svg>`;
-                        case "calc": return `<svg width="30" height="30" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1.5" fill="#666"/><circle cx="7" cy="12" r="1.4" fill="#ff9f0a"/><circle cx="12" cy="12" r="1.4" fill="#ff9f0a"/><circle cx="17" cy="12" r="1.4" fill="#ff9f0a"/><circle cx="7" cy="17" r="1.4" fill="#888"/><circle cx="12" cy="17" r="1.4" fill="#888"/><circle cx="17" cy="17" r="1.4" fill="#888"/></svg>`;
-                        case "calendar": return `<svg width="30" height="30" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="4" fill="#ff3b30"/><text x="12" y="10.5" font-size="4.5" fill="#ff3b30" text-anchor="middle" font-family="Arial" font-weight="700">JEU.</text><text x="12" y="20" font-size="12" fill="#000" text-anchor="middle" font-family="Arial" font-weight="600">23</text></svg>`;
-                        case "camera": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.4"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><rect x="8" y="3" width="8" height="3" rx="1"/></svg>`;
-                        case "wallet": return `<svg width="30" height="24" viewBox="0 0 30 24"><rect x="1" y="1" width="28" height="22" rx="4" fill="#fff" opacity=".15"/><rect x="1" y="5" width="28" height="5" fill="#4fd1ff"/><rect x="1" y="10" width="28" height="5" fill="#ffb648"/></svg>`;
-                        case "chatgpt": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.3"><path d="M9 4a4 4 0 0 1 6 3.5v5A4 4 0 0 1 9 16"/><path d="M15 20a4 4 0 0 1-6-3.5v-5A4 4 0 0 1 15 8"/></svg>`;
-                        case "chrome": return `<svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M12 2a10 10 0 0 1 8.66 5H12a5 5 0 0 0-4.33 2.5L3.34 7A10 10 0 0 1 12 2z" fill="#ea4335"/><path d="M3.34 7L7.67 14.5A5 5 0 0 0 12 17l-4.33 7.5A10 10 0 0 1 3.34 7z" fill="#34a853"/><path d="M12 17a5 5 0 0 0 4.33-7.5H21a10 10 0 0 1-4.33 12L12 17z" fill="#4285f4"/><circle cx="12" cy="12" r="4" fill="#fff"/><circle cx="12" cy="12" r="3" fill="#4285f4"/></svg>`;
-                        case "claude": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 3l2.2 6.8H21l-5.6 4.1 2.2 6.8L12 16.6l-5.6 4.1 2.2-6.8L3 9.8h6.8z" opacity="0"/><path d="M4 17l5-10 2 6-4 6-3-2zm16 0l-5-10-2 6 4 6 3-2z"/></svg>`;
-                        case "contacts": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="1.4"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/></svg>`;
-                        case "copilot": return `<svg width="28" height="28" viewBox="0 0 24 24"><circle cx="9" cy="9" r="5" fill="#3a3aff" opacity=".85"/><circle cx="15" cy="15" r="5" fill="#ff5da2" opacity=".85"/><circle cx="15" cy="9" r="3" fill="#00c2ff" opacity=".85"/></svg>`;
-                        case "voicememo": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="1.6" stroke-linecap="round"><path d="M2 12h2l2-5 2 10 2-14 2 9h2l2-4 2 4h2"/></svg>`;
-                        case "discord": return `<svg width="26" height="20" viewBox="0 0 26 20" fill="#fff"><path d="M22 3.5c-2-1-4-1.5-6-1.7l-.5 1c1.8.4 3.3 1 4.7 1.9-3.9-1.9-8.4-1.9-12.4 0 1.4-.9 2.9-1.5 4.7-1.9l-.5-1c-2 .2-4 .7-6 1.7C2 8 1 13 1.4 17.8c2 1.5 4 2.4 6 3l1.3-1.8c-1.1-.4-2.1-.9-3-1.6.3-.2.5-.4.8-.6 5.6 2.6 11.7 2.6 17.3 0 .3.2.5.4.8.6-.9.7-1.9 1.2-3 1.6l1.3 1.8c2-.6 4-1.5 6-3C25 13 24 8 22 3.5zM9.5 14.5c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4zm7 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4z"/></svg>`;
-                        case "moon": return `<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#8e8e93"/><circle cx="9" cy="8" r="1.3" fill="#5a5a5c"/><circle cx="15" cy="10" r="2" fill="#5a5a5c"/><circle cx="10" cy="15" r="1.6" fill="#5a5a5c"/><circle cx="16" cy="16" r="1" fill="#5a5a5c"/></svg>`;
-                        case "facetime": return `<svg width="26" height="20" viewBox="0 0 26 20" fill="#fff"><rect x="1" y="3" width="16" height="14" rx="3"/><path d="M19 8l6-4v13l-6-4z"/></svg>`;
-                        case "files": return `<svg width="28" height="26" viewBox="0 0 28 24"><path d="M2 5a2 2 0 0 1 2-2h6l2 2h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" fill="#0a84ff"/></svg>`;
-                        case "fitness": return `<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#ff375f" stroke-width="2.2"/><circle cx="12" cy="12" r="7" fill="none" stroke="#a3e635" stroke-width="2.2"/><circle cx="12" cy="12" r="4" fill="none" stroke="#00e5ff" stroke-width="2.2"/></svg>`;
-                        case "franceinfo": return `<svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="7" r="2.3" fill="#ffcc00"/><circle cx="12" cy="16" r="2.3" fill="#ffcc00"/></svg>`;
-                        case "freeform": return `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5ac8fa" stroke-width="1.6" stroke-linecap="round"><path d="M3 15c3-8 6 8 9 0s6-8 9 0"/></svg>`;
-                        case "gemini": return `<svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2c0 6-4 10-10 10 6 0 10 4 10 10 0-6 4-10 10-10-6 0-10-4-10-10z" fill="url(#gg)"/><defs><linearGradient id="gg" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#4285f4"/><stop offset=".5" stop-color="#9b72cb"/><stop offset="1" stop-color="#d96570"/></linearGradient></defs></svg>`;
-                        case "gmail": return `<svg width="28" height="20" viewBox="0 0 28 20"><rect x="1" y="1" width="26" height="18" rx="2" fill="#fff" stroke="#eee"/><path d="M1 3l13 9L27 3" fill="none" stroke="#ea4335" stroke-width="2.4"/><path d="M1 3v14M27 3v14" stroke="#4285f4" stroke-width="2"/></svg>`;
-                        case "google": return `<svg width="26" height="26" viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v4h5.4c-.2 1.3-1 2.4-2 3.1v2.6h3.3c2-1.8 3.1-4.5 3.1-7.7z" fill="#4285f4"/><path d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.6c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.6C4.7 19.6 8.1 22 12 22z" fill="#34a853"/><path d="M6.4 13.9c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V7.5H3a10 10 0 0 0 0 9z" fill="#fbbc05"/><path d="M12 5.8c1.5 0 2.8.5 3.8 1.5l2.9-2.9C17 2.7 14.7 1.8 12 1.8 8.1 1.8 4.7 4.2 3 7.5l3.4 2.6c.8-2.3 3-4.3 5.6-4.3z" fill="#ea4335"/></svg>`;
-                        case "suno": return `<svg width="24" height="16" viewBox="0 0 24 16"><text x="0" y="12" font-size="10" fill="#fff" font-family="Arial" font-weight="800">SUNO</text></svg>`;
-                        case "phone": return `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/></svg>`;
-                        case "tiktok": return `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M16 3c.4 2 2 3.5 4 3.8v3c-1.5 0-2.9-.5-4-1.3v6.6c0 3.3-2.7 5.9-6 5.9s-6-2.6-6-5.9 2.7-5.9 6-5.9c.4 0 .8 0 1.1.1v3.1c-.3-.1-.7-.2-1.1-.2-1.6 0-2.9 1.3-2.9 2.9s1.3 2.9 2.9 2.9 2.9-1.3 2.9-2.9V3h3.1z" fill="#fff"/><path d="M16 3c.4 2 2 3.5 4 3.8v3c-1.5 0-2.9-.5-4-1.3" fill="none" stroke="#25f4ee" stroke-width=".6" transform="translate(-1,-1)"/><path d="M16 3c.4 2 2 3.5 4 3.8v3c-1.5 0-2.9-.5-4-1.3" fill="none" stroke="#fe2c55" stroke-width=".6" transform="translate(1,1)"/></svg>`;
-                        case "translate": return `<svg width="26" height="26" viewBox="0 0 24 24"><rect x="1" y="2" width="15" height="12" rx="3" fill="#fff"/><text x="7" y="11" font-size="7" fill="#111" text-anchor="middle" font-family="Arial" font-weight="700">A</text><rect x="9" y="10" width="14" height="12" rx="3" fill="#111"/><text x="16" y="19" font-size="6" fill="#fff" text-anchor="middle" font-family="Arial">文</text></svg>`;
-                        case "wabiz": return `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2z" opacity="0"/><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.4-1.1A8.5 8.5 0 1 0 12 3.5z"/><circle cx="18.5" cy="5.5" r="4" fill="#25d366"/><path d="M16.7 5.5l1.2 1.2 2-2.4" stroke="#fff" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-                        case "watch": return `<svg width="20" height="26" viewBox="0 0 20 26" fill="none" stroke="#fff" stroke-width="1.4"><rect x="4" y="6" width="12" height="14" rx="4"/><rect x="8" y="2" width="4" height="4"/><rect x="8" y="20" width="4" height="4"/><line x1="18" y1="10" x2="19.5" y2="10" stroke-width="2"/></svg>`;
-                        case "whatsapp": return `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2z"/></svg>`;
-                        case "x": return `<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M18.9 3H22l-7.6 8.7L23 21h-6.9l-5.4-6.6L4.6 21H1.5l8.1-9.3L1 3h7l4.9 6 6-6z"/></svg>`;
-                        default: return "";
-                    }
-                }
-
-                function renderPickerApps(filter){
-                    const f = (filter||"").trim().toLowerCase();
-                    if(!shAppsGroup) return;
-                    shAppsGroup.innerHTML = "";
-                    let anyApp = false;
-                    let lastSection = null;
-
-                    pickerApps.forEach(app => {
-                        const match = app.name.toLowerCase().includes(f);
-                        if(!match) return;
-                        anyApp = true;
-
-                        const section = /[A-Za-z]/.test(app.name[0]) ? app.name[0].toUpperCase() : "#";
-                        if(section !== lastSection){
-                            if(section === "G"){
-                                const header = document.createElement('div');
-                                header.className = "section-header";
-                                header.textContent = "Google";
-                                shAppsGroup.appendChild(header);
-                            }
-                            lastSection = section;
-                        }
-
-                        const row = document.createElement('div');
-                        row.className = "app-row";
-                        row.dataset.appName = app.name;
-                        row.dataset.appId = app.appId;
-                        row.innerHTML = `
-                            <div class="app-icon sheen" style="background:${app.bg}">${renderGlyph(app.glyph)}</div>
-                            <div class="app-name">${app.name}</div>
-                        `;
-                        row.addEventListener("click", () => {
-                            addActionToCurrentShortcut(app.name, "app", app.appId, app.bg, renderGlyph(app.glyph));
-                        });
-                        shAppsGroup.appendChild(row);
-                    });
-
-                    const showActions = "envoyer un message ouvrir l'app lire la musique".includes(f) || f === "";
-                    if(shActionsGroup) shActionsGroup.classList.toggle('hidden', !showActions || f !== "");
-                    if(shSheetEmptyState) shSheetEmptyState.classList.toggle('hidden', anyApp || showActions);
-                }
-
-                const loadShortcuts = () => {
-                    const saved = localStorage.getItem("ios_shortcuts");
-                    if (saved) {
-                        try { shortcuts = JSON.parse(saved); } catch (e) { shortcuts = []; }
-                    }
-                    if (shortcuts.length === 0) {
-                        shortcuts = [
-                            { id: "direct-fi", name: "écouter le direct franceinfo", color: "#ff3b30", action: "url", value: "https://www.francetvinfo.fr/en-direct/radio.html" },
-                            { id: "actus-fi", name: "lire les actus franceinfo", color: "#007aff", action: "url", value: "https://www.francetvinfo.fr/" }
-                        ];
-                        saveShortcuts();
-                    }
-                };
-
-                const saveShortcuts = () => {
-                    localStorage.setItem("ios_shortcuts", JSON.stringify(shortcuts));
-                };
-
-                const renderGrid = (filterQuery = "") => {
-                    const query = filterQuery.trim().toLowerCase();
-                    const filtered = shortcuts.filter((s) => s.name.toLowerCase().includes(query));
-                    if (filtered.length === 0) {
-                        shortcutsGrid.style.display = "none";
-                        emptyState.style.display = "flex";
-                    } else {
-                        shortcutsGrid.style.display = "grid";
-                        emptyState.style.display = "none";
-                    }
-                    shortcutsGrid.innerHTML = filtered.map((s) => {
-                        let badgeHTML = "";
-                        if (s.action === "app") {
-                            const appIcon = APP_ICONS2[s.value];
-                            if (appIcon) {
-                                badgeHTML = `<div style="width: 100%; height: 100%; transform: scale(0.85);">${appIcon}</div>`;
-                            } else {
-                                badgeHTML = `<span style="font-size: 12px; font-weight: bold; color: #fff;">📱</span>`;
-                            }
-                        } else if (s.action === "url") {
-                            badgeHTML = `<span style="font-size: 14px;">🌐</span>`;
-                        } else {
-                            badgeHTML = `<span style="font-size: 14px;">⚡</span>`;
-                        }
-                        return `
-                            <div class="beige-card" data-id="${s.id}" style="background-color: ${s.color || '#30d158'};">
-                                <div class="card-top-row">
-                                    <div class="card-icon-badge">${badgeHTML}</div>
-                                    <div class="card-dots" data-id="${s.id}">•••</div>
-                                </div>
-                                <div class="card-headline">${s.name}</div>
-                            </div>
-                        `;
-                    }).join("");
-
-                    shortcutsGrid.querySelectorAll(".beige-card").forEach((card) => {
-                        const id = card.dataset.id;
-                        const shortcut = shortcuts.find((s) => s.id === id);
-                        card.addEventListener("click", (e) => {
-                            if (e.target.classList.contains("card-dots")) return;
-                            if (!shortcut) return;
-                            if (shortcut.action === "app") {
-                                if (window.openApp) window.openApp(shortcut.value);
-                            } else if (shortcut.action === "url") {
-                                if (window.openApp) window.openApp("safari");
-                            }
-                        });
-                        const dots = card.querySelector(".card-dots");
-                        dots?.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            const confirmDelete = confirm(`Voulez-vous supprimer le raccourci « ${shortcut.name} » ?`);
-                            if (confirmDelete) {
-                                shortcuts = shortcuts.filter((s) => s.id !== id);
-                                saveShortcuts();
-                                renderGrid(searchInput ? searchInput.value : "");
-                                updateFolderBox();
-                            }
-                        });
-                    });
-                };
-
-                const updateFolderBox = () => {
-                    if (!folderBox) return;
-                    if (shortcuts.length > 2) {
-                        folderBox.innerHTML = `
-                            <div class="box-primary-text">${shortcuts.length - 2} Raccourci(s) personnalisé(s)</div>
-                            <div class="box-secondary-text">Plus de raccourcis créés sont disponibles dans le tableau de bord principal.</div>
-                        `;
-                    } else {
-                        folderBox.innerHTML = `
-                            <div class="box-primary-text">Aucun raccourci</div>
-                            <div class="box-secondary-text">Les raccourcis ajoutés à<br>« Raccourcis pour débuter »<br>apparaîtront ici.</div>
-                        `;
-                    }
-                };
-
-                // Open Action Picker & Editor View
-                const openEditor = () => {
-                    const nextNum = shortcuts.length + 1;
-                    const name = "Nouv. raccourci " + nextNum;
-                    if (editorTitleText) editorTitleText.textContent = name;
-                    if (addedActionsList) addedActionsList.innerHTML = "";
-                    if (editorEmpty) editorEmpty.style.display = "block";
-
-                    currentEditingShortcut = {
-                        id: "sh-" + Date.now(),
-                        name: name,
-                        color: "#30d158",
-                        actions: []
-                    };
-
-                    if (editorScreen) editorScreen.classList.add("active");
-                    if (floatingBar) floatingBar.style.display = "none";
-                    applyProgress(0, false);
-                };
-
-                const closeEditor = () => {
-                    if (editorScreen) editorScreen.classList.remove("active");
-                    if (floatingBar) floatingBar.style.display = "flex";
-                    renderGrid(searchInput ? searchInput.value : "");
-                    updateFolderBox();
-                };
-
-                const addActionToCurrentShortcut = (title, type, value, bgStyle, iconSvg) => {
-                    if (!currentEditingShortcut) return;
-
-                    if (editorEmpty) editorEmpty.style.display = "none";
-
-                    const card = document.createElement("div");
-                    card.className = "sh-added-action-card";
-                    card.innerHTML = `
-                        <div style="width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; background:${bgStyle || '#30d158'}">
-                            ${iconSvg || '⚡'}
-                        </div>
-                        <div style="flex:1;">${title}</div>
-                    `;
-                    if (addedActionsList) addedActionsList.appendChild(card);
-
-                    currentEditingShortcut.action = type;
-                    currentEditingShortcut.value = value;
-                    currentEditingShortcut.name = title;
-
-                    // Auto-save shortcut
-                    const existingIdx = shortcuts.findIndex(s => s.id === currentEditingShortcut.id);
-                    if (existingIdx >= 0) {
-                        shortcuts[existingIdx] = currentEditingShortcut;
-                    } else {
-                        shortcuts.push(currentEditingShortcut);
-                    }
-                    saveShortcuts();
-                };
-
-                newShortcutBtn?.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    openEditor();
-                });
-                addPlusBtn?.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    openEditor();
-                });
-                editorBackBtn?.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    closeEditor();
-                });
-
-                if (shSearchInput) {
-                    shSearchInput.addEventListener("input", (e) => {
-                        renderPickerApps(e.target.value);
-                    });
-                }
-
-                // Action rows in picker
-                if (shActionsGroup) {
-                    shActionsGroup.querySelectorAll(".action-row").forEach(row => {
-                        row.addEventListener("click", () => {
-                            const label = row.querySelector(".action-label")?.textContent || "Action";
-                            const actionType = row.dataset.action;
-                            const iconBg = row.querySelector(".action-icon")?.style.background || "#30d158";
-                            const iconSvg = row.querySelector(".action-icon")?.innerHTML || "";
-                            addActionToCurrentShortcut(label, actionType, actionType === "message" ? "imessage" : actionType === "music" ? "music" : "safari", iconBg, iconSvg);
-                        });
-                    });
-                }
-
-                if (shRunBtn) {
-                    shRunBtn.addEventListener("click", () => {
-                        if (currentEditingShortcut && currentEditingShortcut.action === "app") {
-                            if (window.openApp) window.openApp(currentEditingShortcut.value);
-                        } else {
-                            alert("Raccourci exécuté !");
-                        }
-                    });
-                }
-
-                /* --- Draggable Sheet --- */
-                const FULL_TOP = 64,  FULL_BOTTOM = 0,  FULL_RADIUS_BOTTOM = 0;
-                const MINI_TOP = 665, MINI_BOTTOM = 0, MINI_RADIUS_BOTTOM = 0;
-                const RADIUS_TOP = 38;
-
-                let progress = 0;
-                let dragStartY = 0;
-                let dragStartProgress = 0;
-                let dragging = false;
-
-                function applyProgress(p, useCollapsedContent){
-                    if (!sheet) return;
-                    const top = FULL_TOP + p * (MINI_TOP - FULL_TOP);
-                    const bottom = FULL_BOTTOM + p * (MINI_BOTTOM - FULL_BOTTOM);
-                    const radiusBottom = p * MINI_RADIUS_BOTTOM;
-                    sheet.style.top = top + "px";
-                    sheet.style.bottom = bottom + "px";
-                    sheet.style.borderRadius = RADIUS_TOP + "px " + RADIUS_TOP + "px " + radiusBottom + "px " + radiusBottom + "px";
-                    sheet.classList.toggle('collapsed', useCollapsedContent);
-                }
-
-                function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-
-                function onPointerDown(e){
-                    if (!sheet) return;
-                    dragging = true;
-                    sheet.classList.add('dragging');
-                    dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
-                    dragStartProgress = progress;
-                    window.addEventListener('mousemove', onPointerMove);
-                    window.addEventListener('mouseup', onPointerUp);
-                    window.addEventListener('touchmove', onPointerMove, {passive:false});
-                    window.addEventListener('touchend', onPointerUp);
-                }
-
-                function onPointerMove(e){
-                    if(!dragging) return;
-                    e.preventDefault();
-                    const y = (e.touches ? e.touches[0].clientY : e.clientY);
-                    const delta = y - dragStartY;
-                    progress = clamp(dragStartProgress + delta / (MINI_TOP - FULL_TOP), 0, 1);
-                    applyProgress(progress, progress > 0.5);
-                }
-
-                function onPointerUp(){
-                    if(!dragging) return;
-                    dragging = false;
-                    if (sheet) sheet.classList.remove('dragging');
-                    progress = progress < 0.5 ? 0 : 1;
-                    applyProgress(progress, progress === 1);
-                    window.removeEventListener('mousemove', onPointerMove);
-                    window.removeEventListener('mouseup', onPointerUp);
-                    window.removeEventListener('touchmove', onPointerMove);
-                    window.removeEventListener('touchend', onPointerUp);
-                }
-
-                if (grabberZone) {
-                    grabberZone.addEventListener('mousedown', onPointerDown);
-                    grabberZone.addEventListener('touchstart', onPointerDown, {passive:true});
-                    grabberZone.addEventListener('click', ()=>{
-                        if(Math.abs(progress - dragStartProgress) < 0.02){
-                            progress = progress === 0 ? 1 : 0;
-                            applyProgress(progress, progress === 1);
-                        }
-                    });
-                }
-
-                loadShortcuts();
-                renderGrid();
-                updateFolderBox();
-                renderPickerApps("");
-                if (viewShortcuts) {
-                    viewShortcuts.style.display = "block";
-                    viewShortcuts.style.opacity = "1";
-                }
-            }
-
             // js/apps/handlers.js
             var setupPhoneApp2 = setupPhoneApp;
             var initializeMapsApp2 = initializeMapsApp;
@@ -22442,7 +21549,6 @@ var youtubeTemplate = `
             var setupContactsApp2 = setupContactsApp;
             var setupAIChatApp2 = setupAIChatApp;
             var setupClockApp2 = setupClockApp;
-            var setupShortcutsApp2 = setupShortcutsApp;
 
             // js/apps.js
             function getAppDetails(appId) {
@@ -22481,6 +21587,9 @@ var youtubeTemplate = `
                     if (!window.activeApps.includes(appId)) {
                         window.activeApps.push(appId);
                     }
+                    window.captureSimulatorApp?.(appView);
+                    window.activeApps=window.activeApps.filter(id=>id!==appId);window.activeApps.push(appId);
+                    appView.dataset.appId=appId;
                     appView.className = "app-view active";
                     appHeaderContainer.innerHTML = "";
                     appMainContent.innerHTML = "";
@@ -22814,7 +21923,7 @@ var youtubeTemplate = `
                         setupIntelligenceApp2();
                     }
                     if (appId === "shortcuts") {
-                        setupShortcutsApp2();
+                        window.setupShortcutsSimulator(appMainContent);
                     }
                     const existingRecordingDot = dynamicIsland ? dynamicIsland.querySelector(".recording-indicator-island") : null;
                     if (showDynamicIslandIndicator && dynamicIsland && !existingRecordingDot) {
@@ -22847,12 +21956,7 @@ var youtubeTemplate = `
                 }
                 function closeApp() {
                     if (!appView || !appView.classList.contains("active")) return;
-                    const activeClass = Array.from(appView.classList).find(c => c.endsWith("-active"));
-                    if (activeClass && appMainContent && appMainContent.innerHTML) {
-                        const appId = activeClass.replace("-active", "").replace("-app", "");
-                        if (!window.appSnapshots) window.appSnapshots = {};
-                        window.appSnapshots[appId] = appMainContent.innerHTML;
-                    }
+                    window.captureSimulatorApp?.(appView);
                     if (window.hideSystemKeyboard) window.hideSystemKeyboard();
                     document.querySelector(".iphone-screen")?.classList.remove("status-bar-dark");
                     const glow = document.querySelector(".intelligence-glow-overlay");
@@ -24399,22 +23503,14 @@ var youtubeTemplate = `
                 let currentX = 0;
                 let currentY = 0;
                 let activeCard = null;
+                let dragStartTime=0, suppressClickUntil=0, isDismissing=false;
+                const escapeText=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+                const gestureScale=()=>switcher.getBoundingClientRect().height/switcher.offsetHeight||1;
                 function openAppSwitcher() {
                     window.inMultitask = true;
                     const appView = document.getElementById("generic-app-view");
                     if (appView && appView.classList.contains("active")) {
-                        const appMainContent = appView.querySelector(".app-main-content");
-                        const activeClass = Array.from(appView.classList).find(c => c.endsWith("-active"));
-                        if (activeClass && appMainContent && appMainContent.innerHTML.trim()) {
-                            const appId = activeClass.replace("-active", "").replace("-app", "");
-                            if (!window.appSnapshots) window.appSnapshots = {};
-                            // Clone the entire app-view DOM node (deep clone) for a true freeze-frame
-                            const clone = appView.cloneNode(true);
-                            clone.removeAttribute('id');
-                            clone.style.cssText = 'position:absolute;top:0;left:0;width:390px;height:844px;pointer-events:none;overflow:hidden;';
-                            // Remove active class so it doesn't conflict but keep app classes for CSS
-                            window.appSnapshots[appId] = clone.outerHTML;
-                        }
+                        window.captureSimulatorApp?.(appView);
                         appView.classList.remove("active");
                     }
                     const wallpaper = document.querySelector(".wallpaper");
@@ -24439,13 +23535,16 @@ var youtubeTemplate = `
                 function renderDeck() {
                     deck.innerHTML = "";
                     window.activeApps.forEach((appId, index) => {
-                        const metadata = getAppMetadata(appId);
-                        const iconSvg = APP_ICONS2[appId] || `<div class="generic-fallback-icon" style="font-size: 10px; font-weight: bold; color: white;">${metadata.name.substring(0, 1).toUpperCase()}</div>`;
+                        const registeredApp=window.getSimulatorApps?.().find(app=>app.id===appId);
+                        const metadata = {...getAppMetadata(appId),...(registeredApp?{name:registeredApp.name}:{})};
+                        const iconSvg = window.getSimulatorApps?.().find(app=>app.id===appId)?.iconHTML || APP_ICONS2[appId] || `<div class="generic-fallback-icon" style="font-size: 10px; font-weight: bold; color: white;">${metadata.name.substring(0, 1).toUpperCase()}</div>`;
                         const card = document.createElement("div");
                         card.className = "card-wrapper smooth-return";
                         card.id = `card-${appId}`;
                         card.dataset.index = index;
                         card.dataset.appId = appId;
+                        card.tabIndex=0;card.setAttribute("role","button");card.setAttribute("aria-label","Ouvrir "+metadata.name);
+                        card.onkeydown=e=>{if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();killCurrentApp(Number(card.dataset.index));}else if(e.key==="Enter"){e.preventDefault();launchApp(appId);}};
                         const hasSnapshot = window.appSnapshots && window.appSnapshots[appId];
                         // Build card skeleton (no snapshot yet — added via DOM below)
                         card.innerHTML = `
@@ -24453,13 +23552,13 @@ var youtubeTemplate = `
                     <div class="card-icon" style="background-color: ${metadata.iconColor}">
                         ${iconSvg}
                     </div>
-                    <span>${metadata.name}</span>
+                    <span>${escapeText(metadata.name)}</span>
                 </div>
                 <div class="card-body" data-appid="${appId}">
                     ${hasSnapshot ? '' : `
                         <div class="card-app-preview" style="background: ${metadata.gradient}">
                             <div class="preview-icon">${metadata.emoji}</div>
-                            <div class="preview-title">${metadata.name}</div>
+                            <div class="preview-title">${escapeText(metadata.name)}</div>
                             <div class="preview-subtitle">Glissez vers le haut pour fermer</div>
                         </div>
                     `}
@@ -24470,13 +23569,18 @@ var youtubeTemplate = `
                             const cardBody = card.querySelector('.card-body');
                             const wrap = document.createElement('div');
                             wrap.className = 'card-snapshot-wrap';
-                            wrap.innerHTML = window.appSnapshots[appId];
-                            // Disable all iframes inside the snapshot
-                            wrap.querySelectorAll('iframe').forEach(f => f.src = 'about:blank');
+                            const shadow=wrap.attachShadow({mode:"open"});
+                            const linkedStyles=[];for(const sheet of document.styleSheets){if(sheet.href){const link=document.createElement("link");link.rel="stylesheet";link.href=sheet.href;linkedStyles.push(link);}}
+                            let snapshotCss="";for(const sheet of document.styleSheets){try{snapshotCss+=Array.from(sheet.cssRules).map(rule=>rule.cssText).join("\n");}catch{}}
+                            const style=document.createElement("style");style.textContent=snapshotCss;shadow.appendChild(style);linkedStyles.forEach(link=>shadow.appendChild(link));
+                            const frame=document.createElement("div");frame.innerHTML=window.appSnapshots[appId];shadow.appendChild(frame);
+                            wrap.setAttribute("aria-hidden","true");
+                            shadow.querySelectorAll('iframe').forEach(f=>f.remove());
                             cardBody.appendChild(wrap);
+                            const snapshotContent=shadow.querySelector(".app-main-content");if(snapshotContent)snapshotContent.scrollTop=Number(frame.firstElementChild?.dataset.snapshotScroll||0);
                         }
                         card.addEventListener("click", (e) => {
-                            if (dragMode) return;
+                            if (dragMode || performance.now()<suppressClickUntil || isDismissing) return;
                             const pos = parseInt(card.dataset.index);
                             if (pos === currentIndex) {
                                 launchApp(appId);
@@ -24522,7 +23626,11 @@ var youtubeTemplate = `
                     });
                 }
                 function killCurrentApp(index) {
+                    if(isDismissing)return;
                     const appIdToRemove = window.activeApps[index];
+                    if(!appIdToRemove)return;
+                    isDismissing=true;
+                    if(window.appSnapshots)delete window.appSnapshots[appIdToRemove];
                     const cardToDismiss = document.getElementById(`card-${appIdToRemove}`);
                     if (cardToDismiss) {
                         cardToDismiss.classList.remove("smooth-return");
@@ -24538,6 +23646,7 @@ var youtubeTemplate = `
                         currentIndex--;
                     }
                     setTimeout(() => {
+                        isDismissing=false;
                         if (window.activeApps.length === 0) {
                             closeAppSwitcher();
                         } else {
@@ -24553,7 +23662,8 @@ var youtubeTemplate = `
                     }
                 }
                 const handleStart = (clientX, clientY, target) => {
-                    if (window.activeApps.length === 0) return;
+                    if (window.activeApps.length === 0 || isDismissing) return;
+                    dragStartTime=performance.now();
                     isDragging = true;
                     dragMode = null;
                     touchStartX = clientX;
@@ -24570,8 +23680,8 @@ var youtubeTemplate = `
                     if (!isDragging) return;
                     currentX = clientX;
                     currentY = clientY;
-                    const diffX = clientX - touchStartX;
-                    const diffY = clientY - touchStartY;
+                    const diffX = (clientX - touchStartX)/gestureScale();
+                    const diffY = (clientY - touchStartY)/gestureScale();
                     if (dragMode === null) {
                         if (Math.abs(diffX) > 10) {
                             dragMode = "horizontal";
@@ -24593,8 +23703,9 @@ var youtubeTemplate = `
                 const handleEnd = () => {
                     if (!isDragging) return;
                     isDragging = false;
-                    const diffX = currentX - touchStartX;
-                    const diffY = currentY - touchStartY;
+                    const diffX = (currentX - touchStartX)/gestureScale();
+                    const diffY = (currentY - touchStartY)/gestureScale();
+                    if(Math.abs(diffX)>10||Math.abs(diffY)>10)suppressClickUntil=performance.now()+400;
                     window.activeApps.forEach((appId) => {
                         const c = document.getElementById(`card-${appId}`);
                         if (c) c.classList.add("smooth-return");
@@ -24608,7 +23719,7 @@ var youtubeTemplate = `
                         updatePileLogic(0);
                     } else if (dragMode === "vertical" && activeCard) {
                         const cardIndex = parseInt(activeCard.dataset.index);
-                        if (cardIndex === currentIndex && diffY < -100) {
+                        if (cardIndex === currentIndex && (diffY < -135 || (diffY < -55 && diffY/Math.max(1,performance.now()-dragStartTime)<-.45))) {
                             killCurrentApp(cardIndex);
                         } else {
                             updatePileLogic(0);

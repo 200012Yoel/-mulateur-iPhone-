@@ -39,6 +39,8 @@
 .sim-option-row .sim-value{flex-shrink:0;max-width:48%;font-size:13px}
 .settings-active .sim-update-card{margin:30px 0 22px;padding:24px 21px;border-radius:26px;border:1px solid #ffffff16;background:linear-gradient(155deg,#ffffff0b,transparent 55%),#1b1c20;box-shadow:inset 0 1px 0 #fff1}
 .sim-update-icon{height:76px;width:76px;display:grid;place-items:center;border-radius:22px;background:radial-gradient(circle at 25% 20%,#fff9,transparent 48%),linear-gradient(135deg,#c8f0ff,#819cd6 55%,#c3b4e8);color:#182338;font-size:43px;font-weight:600;letter-spacing:-4px;box-shadow:inset 0 1px 1px #fffc,0 8px 30px #0003}
+.settings-active .sim-update-card{padding:18px;margin:24px 0 18px}
+.sim-update-card .sim-update-icon{width:60px;height:60px;border-radius:18px;font-size:35px;letter-spacing:-3px}
 .settings-active .sim-update-card h1{font-size:26px;letter-spacing:-.6px;margin:18px 0 3px}
 .sim-update-caption{color:#9d9da6;font-size:12px;margin:0 0 20px}
 .sim-update-card>p:not(.sim-update-caption){font-size:14px;line-height:1.55;color:#c2c2ca}
@@ -77,3 +79,26 @@
 .sim-default-icon{background:#0a84ff;border-radius:7px;width:30px;height:30px;display:grid;place-items:center;font-size:24px;flex:none}
 .sim-alphabet{position:fixed;right:0;top:28%;display:flex;flex-direction:column;z-index:3}
 .sim-alphabet button{border:0;background:none;color:#0a84ff;font-size:10px;font-weight:600;padding:3px 2px;min-width:15px;cursor:pointer}
+.sim-segments{display:flex;border-radius:9px;background:#242426;padding:3px;margin:28px 0 22px;gap:2px}
+.sim-segments button{flex:1;border:0;border-radius:7px;background:none;color:#f5f5f7;font:inherit;font-size:12px;padding:8px 2px;cursor:pointer}
+.sim-segments button[aria-pressed=true]{background:#606066;box-shadow:0 1px 4px #0005}
+.sim-battery-summary h3{font-size:14px;margin:0;color:#e5e5ea}.sim-battery-summary p{font-size:12px;color:#98989f;margin:5px 0}
+.sim-chart{height:130px;margin:0 12px 18px;border-top:1px solid #333;border-bottom:1px solid #333;background:repeating-linear-gradient(to top,transparent 0,transparent 32px,#ffffff10 33px,transparent 34px);position:relative}
+.sim-bars{height:100%;display:flex;gap:3px;align-items:flex-end;padding:0 2px}
+.sim-bars>span{flex:1;min-width:0;background:#30d158;border-radius:2px 2px 0 0}
+.sim-chart-axis{display:flex;justify-content:space-between;font-size:10px;color:#98989f;padding-top:6px}
+.sim-activity{height:75px}.sim-activity .sim-bars>span{background:#4d9bed}
+.sim-screen-time{display:flex;gap:30px;margin:24px 12px}.sim-screen-time span{display:block;font-size:12px;color:#98989f}.sim-screen-time strong{display:block;font-size:21px;font-weight:400;margin-top:6px}
+.sim-charge-limit{padding:18px}.sim-charge-limit h3{font-size:16px;margin:0 0 8px}.sim-charge-limit p{font-size:13px;color:#aaa;line-height:1.5}
+.sim-charge-limit input[type=range]{width:100%;accent-color:#30d158;margin:18px 0}
+.sim-charge-ticks{display:flex;justify-content:space-between}.sim-charge-ticks button{border:0;background:none;color:#999;font-size:11px;padding:6px 0;cursor:pointer}.sim-charge-ticks button[aria-pressed=true]{color:#30d158;font-weight:600}
+.sim-airdrop-hero{text-align:center;padding:15px 15px 24px}.sim-airdrop-hero>div{font-size:80px;line-height:1;color:#469bff}.sim-airdrop-hero h1{font-size:27px;margin:12px 0}.sim-airdrop-hero p{font-size:13px;color:#aaa;line-height:1.5}
+#app-switcher{background:#0005;backdrop-filter:blur(22px) saturate(1.1)}
+#app-switcher .card-wrapper.dismissed{transform:translate3d(0,-1050px,0) scale(.92)!important;transition:transform .3s cubic-bezier(.25,.1,.25,1),opacity .25s!important}
+#app-switcher .card-wrapper:focus-visible{outline:2px solid #79b7ff;border-radius:26px;outline-offset:6px}
+#app-switcher .card-body{border-color:#ffffff0e;box-shadow:0 12px 35px #0007}
+#app-switcher .carousel-deck{width:272px;height:590px;margin-top:0}
+#app-switcher .card-body{border-radius:36px}
+#app-switcher .card-snapshot-wrap{transform:scale(.6974359)}
+#app-switcher .card-header{font-size:15px;top:-38px}
+@media(prefers-reduced-motion:reduce){#app-switcher,#app-switcher .card-wrapper{transition-duration:.01s!important}}

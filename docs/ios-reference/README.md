@@ -39,3 +39,35 @@ pas les services Apple ou les sites externes affichés dans Safari.
 Les captures et arbres complets figurent dans l’artefact `ios-settings-reference`
 de cette session, annoncé par GitHub comme conservé jusqu’au 24 octobre 2026.
 Les deux images ci-dessus restent disponibles dans le dépôt après cette échéance.
+
+## Deuxième session : captures élargies
+
+[Session du 17 octobre 2026](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39063404091),
+commit `27b10b46357691f364abfd47be2e6629e541efa3`, même modèle et runtime.
+Onze tests ont été exécutés : cinq réussis, six ignorés et aucun échec. L’artefact
+contient 17 images, y compris cinq captures de diagnostic « menu indisponible ».
+Le contrôle de disponibilité confirme Raccourcis installé et App Store absent.
+
+Captures utiles conservées : [Apps](extended/apps.png), [Général](extended/general.png),
+[Réglages milieu](extended/settings-middle.png), [Réglages bas](extended/settings-bottom.png),
+[Raccourcis](extended/shortcuts.png), [Automatisation](extended/automation.png),
+[Galerie](extended/gallery.png), [Sélecteur d’apps](extended/switcher.png).
+
+Les captures montrent les onglets Raccourcis/Automatisation/Galerie, les grandes
+rubriques, la recherche, les cartes, l’état vide d’automatisation et les cartes
+superposées du sélecteur. Ces éléments ont guidé le module web réécrit et les
+proportions des aperçus. La capture du geste suivant ne prouve pas la fermeture
+native d’une carte : ce geste n’est donc pas annoncé comme validé sur iOS. La
+fermeture du simulateur web est, elle, testée par glissement et au clavier.
+
+Batterie, Recharge, AirDrop, Wi-Fi et Mise à jour logicielle sont absents du runtime
+observé. Les nouveaux écrans Batterie/Recharge/AirDrop du projet sont donc des
+interprétations web, pas des reproductions vérifiées par ces captures. Les valeurs
+de charge et d’activité sont fictives. La limite par pas de 5 % et la disponibilité
+de Recharge optimisée uniquement à 100 % suivent la
+[documentation Apple](https://support.apple.com/fr-fr/108055).
+Les propositions iOS 26 puis iOS 27 suivent la
+[présentation Apple](https://support.apple.com/fr-ca/118575), sans téléchargement réel.
+
+L’éditeur Raccourcis web et son moteur local ne reproduisent qu’un sous-ensemble
+des actions iOS. Une correspondance intégrale, écran par écran, n’est pas certifiée.
