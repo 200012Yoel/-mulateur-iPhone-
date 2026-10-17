@@ -23,7 +23,7 @@ jobs:
         env:
           IOS_MAJOR: ${{ inputs.ios_major }}
           CAPTURE_SCOPE: ${{ inputs.scope }}
-        run: python3 scripts/ios-reference/capture.py
+        run: python3 developpement/scripts/ios-reference/capture.py
       - name: Conserver les captures et diagnostics
         if: always()
         uses: actions/upload-artifact@v4
