@@ -11,7 +11,7 @@ const {chromium}=require('playwright');
  await page.evaluate(html=>{document.body.innerHTML='<div class="app-view active settings-active"><div class="app-main-content" id="test-root" style="position:fixed;inset:0;overflow:auto;height:100vh;box-sizing:border-box"></div></div>'; const root=document.querySelector('#test-root');root.innerHTML=html;window.setupSettingsSimulator(root)},template);
  const root=page.locator('#test-root');
  const names=await root.locator('.row-label').allTextContents();
- for(const name of names){if(name==='Mode Avion')continue; await root.locator('.settings-row').filter({has:page.getByText(name,{exact:true})}).click();assert(await root.locator('.sim-nav').count(),name);await root.locator('[data-back]').click()}
+ for(const name of names){if(name==='Mode Avion')continue; await root.locator('.settings-row').filter({has:page.getByText(name,{exact:true})}).click();assert(await root.locator('.sim-nav').count(),name);assert(!(await root.innerText()).includes('Non disponible dans cette simulation'),name);await root.locator('[data-back]').click()}
  await root.locator('.settings-row').filter({has:page.getByText('Wi-Fi',{exact:true})}).click();
  await root.getByRole('button',{name:'Informations sur Maison',exact:true}).click();
  await root.getByRole('combobox',{name:'Configurer le DNS'}).selectOption('Manuel');

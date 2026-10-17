@@ -1,0 +1,65 @@
+/* Translucent navigation and subtle refracted highlights over dark surfaces. */
+.settings-active .app-main-content.sim-dark{
+  background:radial-gradient(ellipse at 100% 0%,#18202955,transparent 45%),#08090b!important;
+  scroll-behavior:auto;
+}
+.settings-active .sim-dark .sim-nav{
+  top:-40px;margin:-12px -8px 20px;min-height:54px;padding:8px;
+  background:linear-gradient(125deg,#ffffff12,#ffffff03 55%,#ffffff0a),#16171bbb;
+  border:1px solid #ffffff20;border-radius:30px;
+  box-shadow:inset 0 1px 0 #ffffff14,0 6px 25px #0004;
+  backdrop-filter:blur(28px) saturate(1.5);-webkit-backdrop-filter:blur(28px) saturate(1.5);
+}
+.settings-active .sim-nav button{
+  background:#ffffff09;border:1px solid #ffffff10;border-radius:24px;
+  padding:9px 12px;min-height:38px;color:#70b4ff;max-width:43%;font-size:14px;
+}
+.settings-active .sim-nav>span{font-size:15px;text-align:center;overflow-wrap:anywhere}
+.settings-active .sim-dark .sim-group,
+.settings-active .sim-dark .settings-group,
+.settings-active .sim-dark .profile-card{
+  background:linear-gradient(130deg,#ffffff05,transparent 55%),#1c1d20!important;
+  border:1px solid #ffffff0a;border-radius:20px;
+  box-shadow:inset 0 1px 0 #ffffff05;
+}
+.settings-active .sim-row{min-height:52px;gap:10px;font-size:16px;padding:10px 15px}
+.settings-active .sim-row .sim-link{min-width:0;line-height:1.35;color:#f2f2f7}
+.settings-active .sim-row .sim-destructive{color:#ff6961}
+.settings-active .sim-row select{font-size:14px;max-width:45%;text-overflow:ellipsis}
+.settings-active .sim-row select:focus-visible{outline:2px solid #70b4ff;border-radius:8px}
+.settings-active .sim-row input[type=checkbox]{margin:0}
+.settings-active .sim-row input[type=checkbox]:after{box-shadow:inset 0 1px 1px #fff8,0 2px 6px #0005}
+.settings-active .sim-row+.sim-row:before{border-color:#ffffff17}
+.settings-active .sim-note{font-size:12px;line-height:1.5;margin:12px 0 20px}
+.settings-active .sim-search{border:1px solid #ffffff0d;border-radius:18px;box-shadow:inset 0 1px 0 #ffffff08}
+.sim-option-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:53px;padding:14px 16px;border:0;background:none;color:#f2f2f7;text-align:left;font:inherit;font-size:15px;cursor:pointer}
+.sim-option-row+.sim-option-row{border-top:1px solid #ffffff17}
+.sim-option-row:active,.sim-network-name:active,.sim-link:active{background:#ffffff0a}
+.sim-option-row[aria-checked=true]{color:#70b4ff}
+.sim-option-row .sim-value{flex-shrink:0;max-width:48%;font-size:13px}
+.settings-active .sim-update-card{margin:30px 0 22px;padding:24px 21px;border-radius:26px;border:1px solid #ffffff16;background:linear-gradient(155deg,#ffffff0b,transparent 55%),#1b1c20;box-shadow:inset 0 1px 0 #fff1}
+.sim-update-icon{height:76px;width:76px;display:grid;place-items:center;border-radius:22px;background:radial-gradient(circle at 25% 20%,#fff9,transparent 48%),linear-gradient(135deg,#c8f0ff,#819cd6 55%,#c3b4e8);color:#182338;font-size:43px;font-weight:600;letter-spacing:-4px;box-shadow:inset 0 1px 1px #fffc,0 8px 30px #0003}
+.settings-active .sim-update-card h1{font-size:26px;letter-spacing:-.6px;margin:18px 0 3px}
+.sim-update-caption{color:#9d9da6;font-size:12px;margin:0 0 20px}
+.sim-update-card>p:not(.sim-update-caption){font-size:14px;line-height:1.55;color:#c2c2ca}
+.sim-update-state{font-weight:600}
+.sim-update-card progress{width:100%;height:7px;accent-color:#70b4ff;border:0;border-radius:10px;overflow:hidden}
+.sim-update-card progress::-webkit-progress-bar{background:#ffffff14;border-radius:10px}
+.sim-update-card progress::-webkit-progress-value{background:linear-gradient(90deg,#478cfe,#96d8ff);border-radius:10px}
+.sim-primary,.sim-secondary{width:100%;padding:16px 20px;min-height:52px;border-radius:28px;font:inherit;font-weight:600;font-size:16px;cursor:pointer;transition:transform .18s,background .18s}
+.sim-primary{border:1px solid #b6dcff55;background:linear-gradient(165deg,#5aaaff,#2079e0);color:#fff;box-shadow:inset 0 1px 0 #fff4,0 5px 18px #0003}
+.sim-secondary{border:1px solid #ffffff17;background:linear-gradient(150deg,#ffffff0b,#ffffff03);backdrop-filter:blur(20px);color:#84bdff;margin-top:10px;box-shadow:inset 0 1px 0 #fff1}
+.sim-primary:active,.sim-secondary:active{transform:scale(.98)}
+.sim-inline-link{background:none;border:0;color:#70b4ff;font:inherit;font-size:14px;padding:10px 0;cursor:pointer}
+.sim-centered{text-align:center}
+.sim-update-check{margin:20px auto;color:#4cde8a;font-size:48px;text-align:center}
+.settings-active .sim-join{background:#101114f5;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}
+.settings-active .sim-dark.sim-solid .sim-nav,.settings-active .sim-dark.sim-solid .sim-secondary{background:#242529;backdrop-filter:none;-webkit-backdrop-filter:none}
+.settings-active .sim-dark.sim-high-contrast .sim-group{border-color:#929299!important}
+.settings-active .sim-dark.sim-high-contrast .sim-note{color:#ddd}
+@media(prefers-reduced-motion:reduce){.settings-active .app-main-content{scroll-behavior:auto}.sim-primary,.sim-secondary{transition:none}}
+#system-keyboard{background:#242529ed;color:#fff;border-color:#ffffff20}
+#system-keyboard .key{background:#626369;color:#fff;box-shadow:0 1px 0 #0008}
+#system-keyboard .key.special{background:#3a3b40;color:#fff}
+#system-keyboard .key.active-shift{background:#dedee3;color:#171719}
+#system-keyboard .key:active{background:#84858c}
