@@ -1,0 +1,7 @@
+artifacts/ios-reference/
+scripts/ios-reference/__pycache__/
+scratch/ios-native-*/
+scratch/github-ios.py
+scratch/apps-live.png
+scratch/*-glass.png
+scratch/*-dark.png

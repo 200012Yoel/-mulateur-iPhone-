@@ -52,7 +52,8 @@ le visuel reste une interprétation web.
 Le workflow manuel et ses scripts sont décrits dans
 [scripts/ios-reference/README.md](scripts/ios-reference/README.md).
 Leur publication sur une branche ne lance pas de session. Le premier lancement
-macOS, la compilation Xcode et les captures natives restent à valider après accord.
+macOS a réussi sur iPhone 16 Pro Max / iOS 18.6 :
+[observations et limites](docs/ios-reference/README.md).
 
 Ce projet est une simulation web indépendante, pas un environnement d’exécution
 iOS. Les réseaux, accessoires, informations matérielles et comptes présentés sont

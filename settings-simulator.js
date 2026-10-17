@@ -70,6 +70,11 @@
     'iCloud': [info('Compte', 'Compte de démonstration'), ...['Photos', 'iCloud Drive', 'Notes', 'Contacts', 'Sauvegarde iCloud'].map(x => toggle(x))],
     'Compte Apple': [info('Compte', 'Yoel Cohen — démonstration'), link('iCloud'), info('Connexion', 'Aucun identifiant Apple demandé')],
     'Apps': apps.map(x => link(x, 'App : ' + x)),
+    'Apps par défaut': [choice('Navigateur', ['Safari']), choice('Appels', ['Téléphone']), choice('Messages', ['Messages'])],
+    'App : Safari': [link('Siri','Safari : Siri'), link('Recherche','Safari : Recherche'), choice('Navigateur par défaut',['Safari']), choice('Langue',['Français','English']), choice('Moteur de recherche',['Google','Bing','DuckDuckGo','Ecosia','Yahoo']), toggle('Utiliser également en navigation privée'), toggle('Suggestions moteur de rech.'), toggle('Suggestions Safari'), toggle('Afficher les recherches récentes'), choice('Recherche rapide',['Oui','Non']), toggle('Précharger le meilleur résultat'), link('Remplissage automatique','Safari : Remplissage automatique'), toggle('Bloquer les pop-up'), toggle('Empêcher le suivi intersite'), toggle('Alerte si site web frauduleux')],
+    'Safari : Siri': [toggle('Apprendre de cette app'), toggle('Afficher dans l’app'), toggle('Suggérer des raccourcis')],
+    'Safari : Recherche': [toggle('Afficher l’app dans Rechercher'),toggle('Afficher le contenu dans Rechercher')],
+    'Safari : Remplissage automatique': [toggle('Utiliser les coordonnées',false),toggle('Cartes bancaires',false),info('Données','Aucune donnée personnelle enregistrée')],
     'Autre réseau…': [field('Nom du réseau', ''), choice('Sécurité', ['WPA2/WPA3', 'Aucune']), {label:'Rejoindre ce réseau',type:'custom-network'}]
   };
   for (const name of ['Ne pas déranger','Repos','Travail','Temps pour soi']) pages[name] = [toggle('Activer', false), toggle('Partager le statut de concentration'), choice('Notifications autorisées', ['Aucune', 'Contacts', 'Tout le monde'])];
@@ -143,7 +148,7 @@
         if (row.type === 'field') control = `<input aria-label="${esc(row.label)}" type="text" value="${esc(value)}" autocomplete="off">`;
         if (row.type === 'range') control = `<input aria-label="${esc(row.label)}" type="range" min="0" max="100" value="${esc(value)}">`;
         if (row.type === 'info') control = `<span class="sim-value">${esc(value)}</span>`;
-        const groups = title.startsWith('Réseau : ') ? {1:'CONFIDENTIALITÉ',3:'ADRESSE IPV4',7:'DNS',9:'PROXY HTTP',10:'RÉSEAU'} : title === 'Général' ? {3:'CONNECTIVITÉ',6:'LANGUE ET SAISIE',10:'GESTION'} : title === 'Apple Intelligence et Siri' ? {1:'SIRI',6:'EXTENSIONS'} : title === 'Mises à jour automatiques' ? {2:'FICHIERS SYSTÈME'} : {};
+        const groups = title.startsWith('Réseau : ') ? {1:'CONFIDENTIALITÉ',3:'ADRESSE IPV4',7:'DNS',9:'PROXY HTTP',10:'RÉSEAU'} : title === 'Général' ? {3:'CONNECTIVITÉ',6:'LANGUE ET SAISIE',10:'GESTION'} : title === 'App : Safari' ? {2:'NAVIGATEUR',3:'LANGUE PRÉFÉRÉE',4:'RECHERCHER',11:'GÉNÉRAL',13:'CONFIDENTIALITÉ ET SÉCURITÉ'} : title === 'Apple Intelligence et Siri' ? {1:'SIRI',6:'EXTENSIONS'} : title === 'Mises à jour automatiques' ? {2:'FICHIERS SYSTÈME'} : {};
         const section = groups[i];
         if (row.type === 'info' || ['connect','forget','custom-network','reset'].includes(row.type)) control = row.type === 'info' ? control : '';
         return `${section ? '</div><h3 class="sim-section-label">'+section+'</h3><div class="sim-group">' : ''}<div class="sim-row" data-row="${i}">${row.target || row.type === 'choice' || ['reset','connect','forget','custom-network'].includes(row.type) ? `<button class="sim-link ${row.type === 'forget' || row.type === 'reset' ? 'sim-destructive' : ''}">${esc(row.label)}</button>` : `<span>${esc(row.label)}</span>`}${control}</div>`;
@@ -183,15 +188,20 @@
     function backButton() { root.querySelector('[data-back]').onclick=()=>{route.pop();render();}; }
     function renderApps() {
       const query=root.querySelector('[data-app-search]')?.value || '';
+      const focused=document.activeElement?.matches('[data-app-search]'), scroll=root.scrollTop;
       const list=catalog().sort((a,b)=>a.name.localeCompare(b.name,'fr'));
-      root.innerHTML=nav('Apps')+'<h1 class="sim-page-title">Apps</h1><input class="sim-search" data-app-search placeholder="Rechercher une app" aria-label="Rechercher une app"><div class="sim-group" data-app-list></div><p class="sim-note">Les apps et leurs icônes suivent celles de l’écran d’accueil du simulateur.</p>';
+      root.innerHTML=nav('Apps')+'<section class="sim-apps-page"><input class="sim-search" data-app-search placeholder="Recherche" aria-label="Rechercher une app"><div class="sim-group sim-default-apps"><button class="sim-option-row" data-defaults><span class="sim-default-icon" aria-hidden="true">▦</span><span class="sim-app-name">Apps par défaut<small>Gérez les apps par défaut de l’iPhone</small></span><span class="sim-chevron" aria-hidden="true">›</span></button></div><div data-app-list></div><nav class="sim-alphabet" aria-label="Index des apps"></nav><p class="sim-note">Les apps et leurs icônes suivent celles de l’écran d’accueil du simulateur.</p></section>';
       const search=root.querySelector('[data-app-search]');search.value=query;
       function filter() {
         const matches=list.filter(app=>app.name.toLocaleLowerCase('fr').includes(search.value.toLocaleLowerCase('fr')));
-        root.querySelector('[data-app-list]').innerHTML=matches.length?matches.map(app=>`<button class="sim-option-row sim-app-row" data-app-id="${esc(app.id)}"><span class="sim-app-icon" aria-hidden="true">${app.iconHTML || esc(app.name.slice(0,1))}</span><span class="sim-app-name">${esc(app.name)}</span><span class="sim-chevron" aria-hidden="true">›</span></button>`).join(''):'<p class="sim-note" role="status">Aucune app trouvée.</p>';
+        const groups=new Map();for(const app of matches){const letter=app.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').slice(0,1).toLocaleUpperCase('fr');if(!groups.has(letter))groups.set(letter,[]);groups.get(letter).push(app);}
+        root.querySelector('[data-app-list]').innerHTML=matches.length?[...groups].map(([letter,items],index)=>`<section data-letter="${esc(letter)}"><h3 class="sim-section-label">${esc(letter)}</h3><div class="sim-group">${items.map(app=>`<button class="sim-option-row sim-app-row" data-app-id="${esc(app.id)}"><span class="sim-app-icon" aria-hidden="true">${app.iconHTML || esc(app.name.slice(0,1))}</span><span class="sim-app-name">${esc(app.name)}</span><span class="sim-chevron" aria-hidden="true">›</span></button>`).join('')}</div></section>`).join(''):'<p class="sim-note" role="status">Aucune app trouvée.</p>';
+        root.querySelector('.sim-alphabet').innerHTML=[...groups.keys()].map(letter=>`<button aria-label="Aller à ${esc(letter)}" data-index="${esc(letter)}">${esc(letter)}</button>`).join('');
+        root.querySelector('.sim-default-apps').hidden=Boolean(search.value);
+        root.querySelectorAll('[data-index]').forEach(button=>button.onclick=()=>{const section=[...root.querySelectorAll('[data-letter]')].find(el=>el.dataset.letter===button.dataset.index);if(section){root.scrollTop=section.offsetTop-70;section.querySelector('button')?.focus({preventScroll:true});}});
         root.querySelectorAll('[data-app-id]').forEach(button=>button.onclick=()=>{const app=list.find(a=>a.id===button.dataset.appId);if(app)open('App : '+app.name);});
       }
-      search.oninput=filter;filter();backButton();root.scrollTop=0;
+      search.oninput=filter;filter();backButton();root.querySelector('[data-defaults]').onclick=()=>open('Apps par défaut');if(focused)search.focus({preventScroll:true});root.scrollTop=query?scroll:0;
     }
     function renderOptions(page) {
       const value=get(page.key,page.options[0]);

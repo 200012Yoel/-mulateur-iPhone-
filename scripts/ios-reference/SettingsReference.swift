@@ -11,11 +11,13 @@ final class SettingsReference: XCTestCase {
     }
 
     func capture(_ name: String) {
+        // Query the hierarchy first: Apps can render its navigation before its list.
+        let description = settings.debugDescription
         let image = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         image.name = name
         image.lifetime = .keepAlways
         add(image)
-        let tree = XCTAttachment(string: settings.debugDescription)
+        let tree = XCTAttachment(string: description)
         tree.name = name + "-accessibility"
         tree.lifetime = .keepAlways
         add(tree)
@@ -39,6 +41,7 @@ final class SettingsReference: XCTestCase {
     func testWifi() throws { try open(["Wi-Fi"]); capture("02-wifi") }
     func testApps() throws {
         try open(["Apps"])
+        XCTAssertTrue(settings.buttons["com.apple.Settings.Apps.DefaultApps"].waitForExistence(timeout: 15))
         capture("03-apps")
         try open(["Safari"])
         capture("04-app-safari")
