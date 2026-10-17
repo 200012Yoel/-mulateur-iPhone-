@@ -21,22 +21,25 @@ def main():
     inventory = json.loads(result.stdout)
     (OUT / "inventory.json").write_text(result.stdout)
     requested = os.environ.get("IOS_MAJOR", "26")
+    exact = os.environ.get("IOS_VERSION", "").strip()
     runtimes = [r for r in inventory["runtimes"] if r.get("isAvailable")
                 and r["identifier"].startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
-                and (requested == "auto" or r["version"].split(".")[0] == requested)]
+                and (requested == "auto" or r["version"].split(".")[0] == requested)
+                and (not exact or r["version"] == exact)]
     if not runtimes:
         raise SystemExit(f"Aucun runtime iOS {requested} installé. Voir inventory.json. Aucun téléchargement automatique.")
     runtime = max(runtimes, key=lambda r: tuple(int(n) for n in r["version"].split(".")))
     types = [d for d in inventory["devicetypes"] if d["name"].startswith("iPhone")]
-    model = next((d for d in types if d["name"] == "iPhone 16 Pro Max"), None)
+    model_name = os.environ.get("IOS_MODEL", "iPhone 17 Pro")
+    model = next((d for d in types if d["name"] == model_name), None)
     if model is None:
-        raise SystemExit("Le modèle demandé iPhone 16 Pro Max est absent du runner.")
+        raise SystemExit(f"Le modèle demandé {model_name} est absent du runner.")
     run("ruby", "-rxcodeproj", "-e", "puts 'xcodeproj disponible'")
     device = run("xcrun", "simctl", "create", "Settings Reference", model["identifier"], runtime["identifier"], capture_output=True).stdout.strip()
     (OUT / "selection.json").write_text(json.dumps({"runtime": runtime, "deviceType": model, "udid": device}, indent=2))
     try:
         run("xcrun", "simctl", "boot", device)
-        run("xcrun", "simctl", "bootstatus", device, "-b")
+        run("xcrun", "simctl", "bootstatus", device, "-b", timeout=240)
         run("xcrun", "simctl", "ui", device, "appearance", "dark")
         capabilities = {}
         for name, bundle in {"shortcuts": "com.apple.shortcuts", "appStore": "com.apple.AppStore", "camera": "com.apple.camera", "photos": "com.apple.mobileslideshow", "wallet": "com.apple.Passbook"}.items():
@@ -51,7 +54,7 @@ def main():
                 "-parallel-testing-enabled", "NO", "-maximum-concurrent-test-simulator-destinations", "1",
                 "-resultBundlePath", str(OUT / "Reference.xcresult"), "CODE_SIGNING_ALLOWED=NO",
                 *(["-only-testing:ReferenceUITests/SettingsReference/testShortcutsDetailed", "-only-testing:ReferenceUITests/SettingsReference/testAppleIntelligenceAvailability", "-only-testing:ReferenceUITests/SettingsReference/testUpdates"] if os.environ.get("CAPTURE_SCOPE") == "shortcuts" else []),
-                stdout=log, stderr=subprocess.STDOUT)
+                stdout=log, stderr=subprocess.STDOUT, timeout=720)
     finally:
         # Preserve evidence even when a menu or test is unavailable on this runtime.
         subprocess.run(["xcrun", "simctl", "io", device, "screenshot", str(OUT / "last-screen.png")], check=False)

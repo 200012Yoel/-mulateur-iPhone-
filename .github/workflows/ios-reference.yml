@@ -3,9 +3,22 @@ on:
   workflow_dispatch:
     inputs:
       ios_major:
-        description: Version majeure déjà installée sur le runner (26, 18 ou auto)
+        description: Version majeure déjà installée sur le runner (27, 26, 18 ou auto)
         default: '26'
         required: true
+      model:
+        description: Modèle de référence
+        type: choice
+        options: [iPhone 17 Pro, iPhone 16 Pro Max]
+        default: iPhone 17 Pro
+      ios_version:
+        description: Version exacte facultative, par exemple 27.0
+        default: ''
+      runner:
+        description: Image Xcode du runner
+        type: choice
+        options: [macos-15, xcode-27]
+        default: macos-15
       scope:
         description: Écrans à capturer
         type: choice
@@ -15,7 +28,7 @@ permissions:
   contents: read
 jobs:
   capture:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +36,8 @@ jobs:
         env:
           IOS_MAJOR: ${{ inputs.ios_major }}
           CAPTURE_SCOPE: ${{ inputs.scope }}
+          IOS_MODEL: ${{ inputs.model }}
+          IOS_VERSION: ${{ inputs.ios_version }}
         run: python3 developpement/scripts/ios-reference/capture.py
       - name: Conserver les captures et diagnostics
         if: always()
