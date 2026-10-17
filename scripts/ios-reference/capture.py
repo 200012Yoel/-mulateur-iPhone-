@@ -38,6 +38,12 @@ def main():
         run("xcrun", "simctl", "boot", device)
         run("xcrun", "simctl", "bootstatus", device, "-b")
         run("xcrun", "simctl", "ui", device, "appearance", "dark")
+        capabilities = {}
+        for name, bundle in {"shortcuts": "com.apple.shortcuts", "appStore": "com.apple.AppStore"}.items():
+            check = subprocess.run(["xcrun", "simctl", "get_app_container", device, bundle, "app"], capture_output=True, text=True)
+            capabilities[name] = check.returncode == 0
+        (OUT / "capabilities.json").write_text(json.dumps(capabilities, indent=2))
+        (OUT / "Capabilities.swift").write_text("enum ReferenceCapabilities {\n" + "\n".join(f"static let {key} = {str(value).lower()}" for key, value in capabilities.items()) + "\n}\n")
         run("ruby", str(ROOT / "scripts/ios-reference/project.rb"), str(OUT))
         with (OUT / "xcodebuild.log").open("w") as log:
             run("xcodebuild", "test", "-project", str(OUT / "Reference.xcodeproj"),

@@ -10,9 +10,9 @@ final class SettingsReference: XCTestCase {
         XCTAssertTrue(settings.wait(for: .runningForeground, timeout: 15))
     }
 
-    func capture(_ name: String) {
+    func capture(_ name: String, app: XCUIApplication? = nil) {
         // Query the hierarchy first: Apps can render its navigation before its list.
-        let description = settings.debugDescription
+        let description = (app ?? settings).debugDescription
         let image = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         image.name = name
         image.lifetime = .keepAlways
@@ -50,5 +50,59 @@ final class SettingsReference: XCTestCase {
         try open(["Général", "General"])
         try open(["Mise à jour logicielle", "Software Update"])
         capture("05-software-update")
+    }
+    func testBattery() throws {
+        try open(["Batterie", "Battery"])
+        capture("06-battery-top")
+        settings.swipeUp()
+        capture("07-battery-bottom")
+    }
+    func testCharging() throws {
+        try open(["Batterie", "Battery"])
+        try open(["Recharge", "Charging"])
+        capture("08-charging")
+    }
+    func testAirDrop() throws {
+        try open(["Général", "General"])
+        capture("09-general")
+        try open(["AirDrop"])
+        capture("10-airdrop")
+    }
+    func testSettingsSections() {
+        capture("11-settings-top")
+        settings.swipeUp()
+        capture("12-settings-middle")
+        settings.swipeUp()
+        capture("13-settings-bottom")
+    }
+    func testShortcuts() throws {
+        guard ReferenceCapabilities.shortcuts else { throw XCTSkip("Raccourcis non installé dans ce runtime") }
+        let app = XCUIApplication(bundleIdentifier: "com.apple.shortcuts")
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        capture("14-shortcuts", app: app)
+        for (label, name) in [("Automatisation", "15-shortcuts-automation"), ("Galerie", "16-shortcuts-gallery")] {
+            let tab = app.tabBars.buttons[label]
+            if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app) }
+        }
+    }
+    func testAppStore() throws {
+        guard ReferenceCapabilities.appStore else { throw XCTSkip("App Store non installé dans ce runtime") }
+        let app = XCUIApplication(bundleIdentifier: "com.apple.AppStore")
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        capture("17-appstore", app: app)
+    }
+    func testSwitcher() {
+        XCUIDevice.shared.press(.home)
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let start = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.99))
+        let middle = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.48))
+        start.press(forDuration: 0.1, thenDragTo: middle, withVelocity: .slow, thenHoldForDuration: 0.8)
+        capture("18-switcher-gesture", app: springboard)
+        let top = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.04))
+        middle.press(forDuration: 0.1, thenDragTo: top)
+        capture("19-switcher-dismiss-gesture", app: springboard)
     }
 }
