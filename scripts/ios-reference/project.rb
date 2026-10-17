@@ -19,6 +19,7 @@ tests = project.new_target(:ui_test_bundle, 'ReferenceUITests', :ios, '18.0')
   end
 end
 tests.add_dependency(host)
+tests.source_build_phase.add_file_reference(project.main_group.new_file(File.join(out, 'Capabilities.swift')))
 tests.build_configurations.each { |c| c.build_settings['TEST_TARGET_NAME'] = host.name }
 project.root_object.attributes['TargetAttributes'] = { tests.uuid => { 'TestTargetID' => host.uuid } }
 project.save
