@@ -87,6 +87,17 @@ final class SettingsReference: XCTestCase {
             if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app) }
         }
     }
+    func captureInstalled(_ installed: Bool, bundle: String, name: String) throws {
+        guard installed else { throw XCTSkip(name + " non installé dans ce runtime") }
+        let app = XCUIApplication(bundleIdentifier: bundle)
+        app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        capture(name, app: app)
+    }
+    func testCamera() throws { try captureInstalled(ReferenceCapabilities.camera, bundle: "com.apple.camera", name: "20-camera") }
+    func testPhotos() throws { try captureInstalled(ReferenceCapabilities.photos, bundle: "com.apple.mobileslideshow", name: "21-photos") }
+    func testWallet() throws { try captureInstalled(ReferenceCapabilities.wallet, bundle: "com.apple.Passbook", name: "22-wallet") }
     func testAppStore() throws {
         guard ReferenceCapabilities.appStore else { throw XCTSkip("App Store non installé dans ce runtime") }
         let app = XCUIApplication(bundleIdentifier: "com.apple.AppStore")
