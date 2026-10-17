@@ -24,7 +24,7 @@ def main():
     inventory = json.loads(result.stdout)
     (OUT / "inventory.json").write_text(result.stdout)
     requested = os.environ.get("IOS_MAJOR", "27")
-    exact = os.environ.get("IOS_VERSION", "27.1").strip()
+    exact = os.environ.get("IOS_VERSION", "27.0").strip()
     runtimes = [r for r in inventory["runtimes"] if r.get("isAvailable")
                 and r["identifier"].startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
                 and (requested == "auto" or r["version"].split(".")[0] == requested)
@@ -68,7 +68,7 @@ def main():
             capabilities[name] = check.returncode == 0
         (OUT / "capabilities.json").write_text(json.dumps(capabilities, indent=2))
         (OUT / "Capabilities.swift").write_text("enum ReferenceCapabilities {\n" + "\n".join(f"static let {key} = {str(value).lower()}" for key, value in capabilities.items()) + "\n}\n")
-        if os.environ.get("CAPTURE_METHOD") == "direct":
+        if os.environ.get("CAPTURE_METHOD") == "direct" and os.environ.get("CAPTURE_SCOPE") == "shortcuts":
             frames=OUT / "frames"
             frames.mkdir(exist_ok=True)
             log=[]

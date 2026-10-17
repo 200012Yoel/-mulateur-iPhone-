@@ -1,0 +1,181 @@
+{
+  "browser": {
+    "mode": "launch",
+    "executable_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  },
+  "start_url": {
+    "url": "http://127.0.0.1:8767/applications/raccourcis.html"
+  },
+  "environment": {
+    "viewport": {
+      "width": 440,
+      "height": 956
+    },
+    "locale": "fr-FR",
+    "timezone": "Europe/Paris",
+    "color_scheme": "dark"
+  },
+  "actions": [
+    {
+      "step_id": "library",
+      "action": "wait_for",
+      "locator": {
+        "kind": "css",
+        "selector": ".sc"
+      },
+      "state": "visible",
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "create",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-new]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "catalog",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-picker]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "text",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-type=text]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "text-value",
+      "action": "fill",
+      "locator": {
+        "kind": "css",
+        "selector": "textarea[name=value]"
+      },
+      "value": {
+        "source": "literal",
+        "value": "Bonjour. Un second exemple. Une dernière phrase."
+      }
+    },
+    {
+      "step_id": "save-action",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": ".sheet .primary"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "run",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-run]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "done",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-done]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "open-library-menu",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-folders]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "automation",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-library-tab=\"Automatisation\"]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "new-automation",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-auto]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "close-automation",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": ".sheet [data-close]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "gallery",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-tab=\"Galerie\"]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "settings",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-prefs]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "ai-mode",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "[data-mode=\"Apple Intelligence\"]"
+      },
+      "timeout_ms": 10000
+    },
+    {
+      "step_id": "close-settings",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": ".sheet [data-close]"
+      },
+      "timeout_ms": 10000
+    }
+  ],
+  "capture": {
+    "after_each_step": [
+      "screenshot"
+    ],
+    "at_end": [
+      "screenshot",
+      "dom",
+      "accessibility"
+    ],
+    "events": [
+      "console"
+    ]
+  }
+}

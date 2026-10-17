@@ -12,8 +12,8 @@ on:
         options: [iPhone 17 Pro Max]
         default: iPhone 17 Pro Max
       ios_version:
-        description: Version exacte facultative, par exemple 27.1
-        default: '27.1'
+        description: Version native exacte de référence ; distincte du profil HTML
+        default: '27.0'
       runner:
         description: Image Xcode du runner
         type: choice
@@ -28,7 +28,7 @@ on:
         description: Écrans à capturer
         type: choice
         options: [all, shortcuts]
-        default: all
+        default: shortcuts
 permissions:
   contents: read
 jobs:

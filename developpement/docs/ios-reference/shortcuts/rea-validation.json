@@ -1,0 +1,81 @@
+{
+  "provider": "REA CLI 6.5.0",
+  "evidence_id": "ev_0fdb19b7a166e2811b97c906eaf723bdcbbb809b709f7bb107f3dfcbb9a05e3f",
+  "complete_evidence_sha256": "05a490accd816685d1d7112576091f92a86803e3e72e90c0ba11204dfc3c8708",
+  "steps": [
+    {
+      "step_id": "scenario_start",
+      "status": "completed"
+    },
+    {
+      "step_id": "library",
+      "status": "completed"
+    },
+    {
+      "step_id": "create",
+      "status": "completed"
+    },
+    {
+      "step_id": "catalog",
+      "status": "completed"
+    },
+    {
+      "step_id": "text",
+      "status": "completed"
+    },
+    {
+      "step_id": "text-value",
+      "status": "completed"
+    },
+    {
+      "step_id": "save-action",
+      "status": "completed"
+    },
+    {
+      "step_id": "run",
+      "status": "completed"
+    },
+    {
+      "step_id": "done",
+      "status": "completed"
+    },
+    {
+      "step_id": "open-library-menu",
+      "status": "completed"
+    },
+    {
+      "step_id": "automation",
+      "status": "completed"
+    },
+    {
+      "step_id": "new-automation",
+      "status": "completed"
+    },
+    {
+      "step_id": "close-automation",
+      "status": "completed"
+    },
+    {
+      "step_id": "gallery",
+      "status": "completed"
+    },
+    {
+      "step_id": "settings",
+      "status": "completed"
+    },
+    {
+      "step_id": "ai-mode",
+      "status": "completed"
+    },
+    {
+      "step_id": "close-settings",
+      "status": "completed"
+    }
+  ],
+  "events": {
+    "retained": 0,
+    "dropped": 0,
+    "items": []
+  },
+  "cleanup": "terminated-owned-process"
+}

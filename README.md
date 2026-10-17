@@ -16,7 +16,7 @@ sont pas supprimées par le nettoyage du projet.
 - `applications/photos.js` : photothèque, collections, lecture et favoris.
 - `applications/wallet.js` : cartes fictives et gestion du portefeuille local.
 
-Dans Raccourcis, **⚙** permet de choisir Classique ou
+Dans Raccourcis, **retour en haut à gauche > Réglages de Raccourcis** permet de choisir Classique ou
 Apple Intelligence. Les actions intelligentes restent une démonstration locale,
 sans moteur Apple ni ChatGPT. Les mises à jour iOS, comptes et réseaux sont simulés.
 
@@ -47,9 +47,27 @@ Validation de la refonte : `node developpement/tests/shortcuts-rewrite.cjs`.
 
 
 Le lancement principal reste **Lancer.cmd → index.html**. Touchez **Raccourcis**
-sur l’accueil : le libellé « Raccourcis · 3.1 » confirme la nouvelle version.
+sur l’accueil : la version 3.2 figure dans les réglages de Raccourcis.
 Le profil iPhone 17 Pro Max / iOS 27.1 remplace automatiquement l’ancien profil,
 y compris dans Informations et Mises à jour, sans effacer les données des apps.
 Les références des scripts incluent un numéro de version pour renouveler leur cache.
-Le script de capture native demande maintenant ce modèle et cette version exacte ;
-il s’arrête explicitement si le runtime 27.1 est absent, sans lancer iOS 18 à la place.
+La capture native demande iPhone 17 Pro Max / iOS 27.0 par défaut, conformément
+à la version disponible et acceptée ; le profil HTML reste en 27.1. Toute version
+exacte demandée est respectée : le script s’arrête si son runtime est absent.
+
+
+## Références natives et REA — version 3.2
+
+La bibliothèque suit les captures réelles iPhone 17 Pro Max / iOS 27.0 :
+Sélectionner en haut, ajout flottant en bas, recherche et état vide centrés.
+La surface de l’écran simulé mesure 440 × 956 points, hors cadre du téléphone.
+Les dossiers, les automatisations, la galerie, les actions d’app et les réglages
+sont accessibles depuis le bouton de retour en haut à gauche de la bibliothèque.
+Le menu Réglages propose toujours les modes Classique et Apple Intelligence local.
+
+Les captures et leur portée sont documentées dans
+`developpement/docs/ios-reference/shortcuts/ios27-reference.md`.
+Le scénario REA reproductible est `developpement/scripts/shortcuts-scenario.json` ;
+`shortcuts-preview.py` ne sert que les deux fichiers publics de Raccourcis sur
+127.0.0.1:8767, avec une erreur 404 pour tout autre chemin. Les preuves complètes
+et images de travail restent dans `developpement/sorties`, ignoré par Git.

@@ -1,0 +1,23 @@
+{
+  "bibliotheque.png": {
+    "sha256": "a2557da45faae6d9a0592fb50170c0a1a142ef2df312b6ffe583f5b173c4ca43",
+    "pixels": [
+      1320,
+      2868
+    ]
+  },
+  "editeur.png": {
+    "sha256": "e310239624fdbd79bb0bf091b030c3ce6139682ffd4c7472f549087d9ba7e6d3",
+    "pixels": [
+      1320,
+      2868
+    ]
+  },
+  "galerie-chargement.png": {
+    "sha256": "9b7baea279ff835199fcf728d1056e88df340facc85bc67703a49f5471b244b8",
+    "pixels": [
+      1320,
+      2868
+    ]
+  }
+}
