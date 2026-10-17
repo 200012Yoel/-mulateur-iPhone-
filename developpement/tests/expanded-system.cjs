@@ -17,8 +17,7 @@ const {chromium}=require('playwright');
  await root.getByRole('button',{name:'100 %',exact:true}).click();assert(await root.getByRole('checkbox',{name:'Recharge optimisée de la batterie'}).isChecked());
  await page.screenshot({path:'developpement/sorties/charging-rebuilt.png',animations:'disabled'});
  await open('settings');await settingsRow('Général').click();await root.getByRole('button',{name:'Mise à jour logicielle',exact:true}).click();
- assert(await root.getByRole('heading',{name:'iOS 26',exact:true}).count());assert(await root.getByRole('button',{name:'Mettre à niveau vers iOS 27',exact:true}).count());await page.screenshot({path:'developpement/sorties/updates-two-versions.png',animations:'disabled'});
- await root.getByRole('button',{name:'Mettre à niveau vers iOS 27',exact:true}).click();assert(await root.getByRole('heading',{name:'iOS 27',exact:true}).count());
+ assert(await root.getByRole('heading',{name:'iOS 27.1',exact:true}).count());assert.match(await root.innerText(),/Votre iPhone est à jour/);
  await open('settings');await settingsRow('Général').click();await root.getByRole('button',{name:'AirDrop',exact:true}).click();await root.getByRole('radio',{name:'Réception désactivée',exact:true}).click();assert.equal(await root.getByRole('radio',{name:'Réception désactivée',exact:true}).getAttribute('aria-checked'),'true');
  await open('shortcuts');await root.getByLabel('Créer un raccourci',{exact:true}).click();await root.getByLabel('Nom du raccourci').fill('Routine de test');await root.getByLabel('Nom du raccourci').blur();
  async function add(type,value){await root.locator('[data-picker]').click();await root.locator('[data-type="'+type+'"]').click();if(type==='text')await root.locator('textarea[name=value]').fill(value);else await root.getByLabel('État',{exact:true}).selectOption(value);await root.getByRole('button',{name:'Enregistrer',exact:true}).click();}

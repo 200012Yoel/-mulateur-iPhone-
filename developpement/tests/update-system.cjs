@@ -5,7 +5,7 @@ const {chromium}=require('playwright');
  const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
  const page=await browser.newPage({viewport:{width:1200,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(require('url').pathToFileURL(require('path').resolve('index.html')).href);
- await page.clock.install();await page.evaluate(()=>window.openApp('settings'));
+ await page.clock.install();await page.evaluate(()=>window.setSimulatedSetting('update/installedMajor',27));await page.evaluate(()=>window.openApp('settings'));
  const root=page.locator('#generic-app-view .app-main-content');
  await root.locator('.settings-row').filter({has:page.getByText('Général',{exact:true})}).click();
  await root.getByRole('button',{name:'Mise à jour logicielle',exact:true}).click();

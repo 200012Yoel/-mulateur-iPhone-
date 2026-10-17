@@ -3,22 +3,22 @@ on:
   workflow_dispatch:
     inputs:
       ios_major:
-        description: Version majeure déjà installée sur le runner (27, 26, 18 ou auto)
-        default: '26'
+        description: Version majeure déjà installée sur le runner (27)
+        default: '27'
         required: true
       model:
         description: Modèle de référence
         type: choice
-        options: [iPhone 17 Pro, iPhone 16 Pro Max]
-        default: iPhone 17 Pro
+        options: [iPhone 17 Pro Max]
+        default: iPhone 17 Pro Max
       ios_version:
-        description: Version exacte facultative, par exemple 27.0
-        default: ''
+        description: Version exacte facultative, par exemple 27.1
+        default: '27.1'
       runner:
         description: Image Xcode du runner
         type: choice
         options: [macos-15, xcode-27]
-        default: macos-15
+        default: xcode-27
       scope:
         description: Écrans à capturer
         type: choice
@@ -44,6 +44,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-settings-reference
-          path: artifacts/ios-reference
+          path: |
+            artifacts/ios-reference/selection.json
+            artifacts/ios-reference/inventory.json
+            artifacts/ios-reference/capabilities.json
+            artifacts/ios-reference/xcodebuild.log
+            artifacts/ios-reference/last-screen.png
+            artifacts/ios-reference/frames/
+            artifacts/ios-reference/screenshots/
           retention-days: 7
           if-no-files-found: warn

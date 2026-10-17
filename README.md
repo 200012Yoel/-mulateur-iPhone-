@@ -41,6 +41,15 @@ et test manuel ; réglages des modes Classique et Apple Intelligence ; import/ex
 Les chaînes prennent en charge texte, saisie, calcul, date, attente annulable,
 transformation de texte, ouverture d’apps et commandes Wi-Fi/économie d’énergie.
 La version intégrée conserve les raccourcis précédents. Le profil visuel annoncé est
-iPhone 17 Pro / iOS 27.0 ; ce programme HTML ne lance pas iOS.
+iPhone 17 Pro Max / iOS 27.1 ; ce programme HTML ne lance pas iOS.
 
 Validation de la refonte : `node developpement/tests/shortcuts-rewrite.cjs`.
+
+
+Le lancement principal reste **Lancer.cmd → index.html**. Touchez **Raccourcis**
+sur l’accueil : le libellé « Raccourcis · 3.1 » confirme la nouvelle version.
+Le profil iPhone 17 Pro Max / iOS 27.1 remplace automatiquement l’ancien profil,
+y compris dans Informations et Mises à jour, sans effacer les données des apps.
+Les références des scripts incluent un numéro de version pour renouveler leur cache.
+Le script de capture native demande maintenant ce modèle et cette version exacte ;
+il s’arrête explicitement si le runtime 27.1 est absent, sans lancer iOS 18 à la place.

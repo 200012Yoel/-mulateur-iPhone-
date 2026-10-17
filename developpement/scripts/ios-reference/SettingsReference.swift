@@ -87,33 +87,60 @@ final class SettingsReference: XCTestCase {
             if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app) }
         }
     }
-    func testShortcutsDetailed() throws {
+    func shortcutsReference() throws -> XCUIApplication {
         guard ReferenceCapabilities.shortcuts else { throw XCTSkip("Raccourcis absent") }
         let app = XCUIApplication(bundleIdentifier: "com.apple.shortcuts")
         app.launchArguments = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
         app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 25))
+        for label in ["Continuer", "Continue", "Commencer", "Get Started"] {
+            let button = app.buttons[label].firstMatch
+            if button.exists && button.isHittable { button.tap() }
+        }
+        return app
+    }
+    func testShortcutsDetailed() throws {
+        let app = try shortcutsReference()
         capture("sc-01-library", app: app)
-        let search = app.searchFields.firstMatch
-        if search.exists { search.tap(); search.typeText("Apple Intelligence"); capture("sc-02-search-intelligence", app: app); search.clearAndEnterText("") }
-        app.terminate(); app.launch()
-        let add = app.buttons["ajouter"].firstMatch
-        if add.waitForExistence(timeout: 8) {
-            add.tap(); capture("sc-03-editor", app: app)
-            let actionSearch = app.searchFields.firstMatch
-            if actionSearch.waitForExistence(timeout: 5) {
-                for (index, query) in ["Texte", "Utiliser un modèle", "Résumer", "Apple Intelligence", "Wi-Fi"].enumerated() {
-                    actionSearch.clearAndEnterText(query)
-                    capture("sc-search-" + String(index) + "-" + query, app: app)
-                }
-            }
-            app.swipeUp(); capture("sc-04-editor-lower", app: app)
+        for label in ["Modifier", "Edit"] {
+            let button=app.buttons[label].firstMatch
+            if button.exists && button.isHittable { button.tap(); capture("sc-02-library-edit", app: app); break }
         }
-        app.terminate(); app.launch()
-        for (label, name) in [("Automatisation", "sc-05-automation"), ("Galerie", "sc-06-gallery")] {
-            let tab = app.tabBars.buttons[label]
-            if tab.waitForExistence(timeout: 5) { tab.tap(); capture(name, app: app); app.swipeUp(); capture(name + "-lower", app: app) }
+    }
+    func testShortcutsEditorReference() throws {
+        let app = try shortcutsReference()
+        let add = app.buttons.matching(NSPredicate(format: "label ==[c] 'ajouter' OR label ==[c] 'add' OR label == '+'")).firstMatch
+        guard add.waitForExistence(timeout: 8) else { capture("sc-editor-add-unavailable", app: app); throw XCTSkip("Bouton Ajouter absent") }
+        add.tap(); capture("sc-03-editor", app: app)
+        for label in ["Scripts", "Appareil", "Documents", "Apps"] {
+            let button = app.buttons[label].firstMatch
+            if button.exists && button.isHittable { button.tap(); capture("sc-category-" + label, app: app); break }
         }
+        let search=app.searchFields.firstMatch
+        if search.exists && search.isHittable {
+            search.tap()
+            if app.keyboards.firstMatch.waitForExistence(timeout: 3) {
+                search.typeText("Texte"); capture("sc-04-search-text", app: app)
+            } else { capture("sc-04-search-no-keyboard", app: app) }
+        }
+        app.swipeUp(); capture("sc-05-editor-lower", app: app)
+    }
+    func testShortcutsAutomationReference() throws {
+        let app = try shortcutsReference()
+        let tab=app.buttons["Automatisation"].firstMatch
+        guard tab.waitForExistence(timeout: 5) else { throw XCTSkip("Onglet Automatisation absent") }
+        tab.tap(); capture("sc-06-automation", app: app)
+        for label in ["Nouvelle automatisation", "Créer une automatisation personnelle", "New Automation"] {
+            let b=app.buttons[label].firstMatch
+            if b.exists && b.isHittable { b.tap(); capture("sc-07-automation-triggers", app: app); app.swipeUp(); capture("sc-08-automation-triggers-lower", app: app); break }
+        }
+    }
+    func testShortcutsGalleryReference() throws {
+        let app = try shortcutsReference()
+        let tab=app.buttons["Galerie"].firstMatch
+        guard tab.waitForExistence(timeout: 5) else { throw XCTSkip("Onglet Galerie absent") }
+        tab.tap(); capture("sc-09-gallery", app: app)
+        app.swipeUp(); capture("sc-10-gallery-lower", app: app)
     }
     func testAppleIntelligenceAvailability() throws {
         try open(["Apple Intelligence et Siri", "Apple Intelligence & Siri"])

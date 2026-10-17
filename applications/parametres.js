@@ -475,6 +475,16 @@ window.settingsTemplate = `
   const storageKey = 'iphone.settings.v1';
   let state = {};
   try { state = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch {}
+  // Migration du profil uniquement : les comptes, photos et raccourcis sont conservés.
+  if(state['device/profile']!=='iphone17promax-ios27.1') {
+    state['device/profile']='iphone17promax-ios27.1';
+    state['update/installedMajor']=27.1;
+    state['update/target']=27.1;
+    state['update/installed']=true;
+    for(const key of ['update/downloadStarted','update/installStarted','update/scheduled'])delete state[key];
+    if(Array.isArray(state['account/devices']))state['account/devices']=state['account/devices'].map(d=>d.current?{...d,model:'iPhone 17 Pro Max'}:d);
+    try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}
+  }
   const get = (key, fallback) => state[key] ?? fallback;
   const save = () => { try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch {} window.dispatchEvent(new Event('simulated-settings-changed')); };
   window.setSimulatedSetting=(key,value)=>{state[key]=value;save();};
@@ -552,7 +562,7 @@ window.settingsTemplate = `
   };
   for (const name of ['Ne pas déranger','Repos','Travail','Temps pour soi']) pages[name] = [toggle('Activer', false), toggle('Partager le statut de concentration'), choice('Notifications autorisées', ['Aucune', 'Contacts', 'Tout le monde'])];
   function definition(title) {
-    if(title==='Informations')return pages[title].map(row=>row.label==='Version du système'?info(row.label,'iOS '+get('update/installedMajor','18.6')+' (simulation)'):row.label==='Nom du modèle'?info(row.label,'iPhone 17 Pro (simulation)'):row);
+    if(title==='Informations')return pages[title].map(row=>row.label==='Version du système'?info(row.label,'iOS '+get('update/installedMajor','27.1')+' (simulation)'):row.label==='Nom du modèle'?info(row.label,'iPhone 17 Pro Max (simulation)'):row);
     if (pages[title]) return pages[title];
     if (title.startsWith('Réseau : ')) return [toggle('Connexion auto'), choice('Adresse Wi-Fi privée', ['Fixe', 'Rotation', 'Désactivée']), toggle('Limiter le suivi de l’adresse IP'), choice('Configurer l’IP', ['Automatique', 'Manuel']), field('Adresse IP', '192.168.1.24'), field('Masque de sous-réseau', '255.255.255.0'), field('Routeur', '192.168.1.1'), choice('Configurer le DNS', ['Automatique', 'Manuel']), field('Serveur DNS', '192.168.1.1'), choice('Configurer le proxy', ['Non', 'Manuel', 'Automatique']), {label:'Se connecter à ce réseau',type:'connect'}, {label:'Oublier ce réseau',type:'forget'}, info('Adresse Wi-Fi','02:00:00:16:26:18 (simulation)'),info('Sécurité','WPA2/WPA3 personnel')];
     if (title.startsWith('Accessoire : ')) return [field('Nom',title.slice(13)), choice('Type d’appareil',['Casque','Enceinte','Autre']), toggle('Connecté',false)];
@@ -573,7 +583,7 @@ window.settingsTemplate = `
     root.refreshSettingsApps=()=>{if(root.settingsSession===session && (route.at(-1)==='Apps' || route.at(-1)?.startsWith('App : ')))render();};
     const keyFor = (title, row) => title + '/' + row.label;
     function applyAppearance() {
-      root.classList.add('sim-dark');root.classList.toggle('sim-ios26',Number(get('update/installedMajor',18))>=26);
+      root.classList.add('sim-dark');root.classList.toggle('sim-ios26',Number(get('update/installedMajor',27.1))>=26);
       root.classList.toggle('sim-bold',get('Affichage et taille du texte/Texte en gras',false));
       root.classList.toggle('sim-reduced-motion',get('Mouvement/Réduire les animations',false));
       root.classList.toggle('sim-solid',get('Affichage et taille du texte/Réduire la transparence',false));
@@ -705,7 +715,7 @@ window.settingsTemplate = `
       root.querySelectorAll('[data-config]').forEach(input=>input.onchange=()=>{state[prefix+'/'+input.dataset.config]=input.value;save();});root.scrollTop=0;
     }
     function renderUpdate() {
-      const target=Number(get('update/target',26)), installedMajor=Number(get('update/installedMajor',get('update/installed',false)?target:18));
+      const target=Number(get('update/target',27.1)), installedMajor=Number(get('update/installedMajor',get('update/installed',false)?target:27.1));
       const now=Date.now(), downloadStarted=get('update/downloadStarted',0), installStarted=get('update/installStarted',0);
       let phase=installedMajor>=target?'installed':'available', percent=0;
       if (installStarted && installedMajor<target) {
@@ -718,13 +728,11 @@ window.settingsTemplate = `
       }
       const busy=['downloading','preparing','installing'].includes(phase);
       const labels={available:'Une mise à jour est disponible',downloading:'Téléchargement…',preparing:'Préparation de la mise à jour…',ready:'Prête à être installée',installing:'Installation…',installed:'Votre iPhone est à jour'};
-      root.innerHTML=nav('Mise à jour logicielle','Général')+`<div data-update-screen><div class="sim-group"><button class="sim-option-row" data-auto><span>Mises à jour automatiques</span><span class="sim-value">${get('Mises à jour automatiques/Installer les mises à jour iOS',true)?'Oui':'Non'} ›</span></button><button class="sim-option-row" data-beta><span>Mises à jour bêta</span><span class="sim-value">${esc(get('Mises à jour bêta/Programme bêta','Non'))} ›</span></button></div><article class="sim-update-card"><div class="sim-update-icon" aria-hidden="true">${target}</div><h1>iOS ${target}</h1><p class="sim-update-caption">Mise à jour de démonstration</p><p class="sim-update-state" role="status" aria-live="polite">${labels[phase]}</p>${busy?`<progress max="100" value="${percent}" aria-label="${labels[phase]}"></progress><p class="sim-note">${percent} % · Simulation locale</p>`:''}${phase==='installed'?'<div class="sim-update-check" aria-hidden="true">✓</div>':'<p>Améliorations de l’interface et correctifs pour le simulateur.</p><button class="sim-inline-link" data-notes>En savoir plus</button>'}</article>${phase==='available'?'<button class="sim-primary" data-download>Mettre à jour maintenant</button><button class="sim-secondary" data-tonight>Mettre à jour cette nuit</button>':phase==='ready'?'<button class="sim-primary" data-install>Installer maintenant</button>':busy?'<button class="sim-secondary" data-cancel-update>Annuler la simulation</button>':'<button class="sim-secondary" data-recheck>Rechercher des mises à jour</button>'}${target===26 && installedMajor<27 && !busy?'<h3 class="sim-section-label">ÉGALEMENT DISPONIBLE</h3><div class="sim-group"><button class="sim-option-row" data-upgrade><span>Mettre à niveau vers iOS 27</span><span class="sim-chevron" aria-hidden="true">›</span></button></div>':target===27 && installedMajor<26 && !busy?'<button class="sim-secondary" data-older>Voir la mise à jour iOS 26</button>':''}<p class="sim-note sim-centered">Aucune mise à jour Apple n’est téléchargée. Cette démonstration ne modifie que l’état du simulateur.</p><p class="sim-note" role="status" id="sim-status"></p></div>`;
+      root.innerHTML=nav('Mise à jour logicielle','Général')+`<div data-update-screen><div class="sim-group"><button class="sim-option-row" data-auto><span>Mises à jour automatiques</span><span class="sim-value">${get('Mises à jour automatiques/Installer les mises à jour iOS',true)?'Oui':'Non'} ›</span></button><button class="sim-option-row" data-beta><span>Mises à jour bêta</span><span class="sim-value">${esc(get('Mises à jour bêta/Programme bêta','Non'))} ›</span></button></div><article class="sim-update-card"><div class="sim-update-icon" aria-hidden="true">${target}</div><h1>iOS ${target}</h1><p class="sim-update-caption">Mise à jour de démonstration</p><p class="sim-update-state" role="status" aria-live="polite">${labels[phase]}</p>${busy?`<progress max="100" value="${percent}" aria-label="${labels[phase]}"></progress><p class="sim-note">${percent} % · Simulation locale</p>`:''}${phase==='installed'?'<div class="sim-update-check" aria-hidden="true">✓</div>':'<p>Améliorations de l’interface et correctifs pour le simulateur.</p><button class="sim-inline-link" data-notes>En savoir plus</button>'}</article>${phase==='available'?'<button class="sim-primary" data-download>Mettre à jour maintenant</button><button class="sim-secondary" data-tonight>Mettre à jour cette nuit</button>':phase==='ready'?'<button class="sim-primary" data-install>Installer maintenant</button>':busy?'<button class="sim-secondary" data-cancel-update>Annuler la simulation</button>':'<button class="sim-secondary" data-recheck>Rechercher des mises à jour</button>'}<p class="sim-note sim-centered">Aucune mise à jour Apple n’est téléchargée. Cette démonstration ne modifie que l’état du simulateur.</p><p class="sim-note" role="status" id="sim-status"></p></div>`;
       if(phase==='installing'){const boot=document.createElement('section');boot.className='sim-update-restart';boot.innerHTML=`<div class="sim-boot-name">iPhone</div><progress max="100" value="${percent}" aria-label="Installation du système simulé"></progress><p>${percent<80?'Installation…':'Redémarrage…'}</p><small>Simulation iOS ${target}</small>`;root.append(boot);}
       if(phase==='available' && get('update/scheduled',false))root.querySelector('#sim-status').textContent='Choix « cette nuit » enregistré. Relancez manuellement la démonstration quand vous le souhaitez.';
       backButton();root.querySelector('[data-auto]').onclick=()=>open('Mises à jour automatiques');root.querySelector('[data-beta]').onclick=()=>open('Mises à jour bêta');
       const bind=(selector,handler)=>{const el=root.querySelector(selector);if(el)el.onclick=handler;};
-      const choose=version=>{state['update/target']=version;delete state['update/downloadStarted'];delete state['update/installStarted'];state['update/installed']=installedMajor>=version;save();render();};
-      bind('[data-upgrade]',()=>choose(27));bind('[data-older]',()=>choose(26));
       bind('[data-download]',()=>{state['update/downloadStarted']=Date.now();delete state['update/scheduled'];save();render();});
       bind('[data-install]',()=>{state['update/installStarted']=Date.now();save();render();});
       bind('[data-cancel-update]',()=>{delete state['update/downloadStarted'];delete state['update/installStarted'];save();render();});
@@ -735,7 +743,7 @@ window.settingsTemplate = `
       if(busy)updateTimer=setTimeout(()=>{if(root.isConnected && root.settingsSession===session && route.at(-1)==='Mise à jour logicielle' && root.querySelector('[data-update-screen]'))render();},250);
     }
     function renderAccount() {
-      const devices=get('account/devices',[{id:'iphone',name:'iPhone de Yoel',model:'iPhone 17 Pro',current:true},{id:'mac',name:'MacBook Pro',model:'MacBook Pro 14 pouces'},{id:'watch',name:'Apple Watch',model:'Apple Watch Series 10'}]);
+      const devices=get('account/devices',[{id:'iphone',name:'iPhone de Yoel',model:'iPhone 17 Pro Max',current:true},{id:'mac',name:'MacBook Pro',model:'MacBook Pro 14 pouces'},{id:'watch',name:'Apple Watch',model:'Apple Watch Series 10'}]);
       const name=get('account/name','Yoel Cohen');
       const groups=[['Informations personnelles','Connexion et sécurité','Paiement et livraison','Abonnements'],['iCloud','Famille','Localiser','Contenu multimédia et achats']];
       root.innerHTML=nav('Compte Apple')+`<header class="sim-account-hero"><div class="sim-account-avatar" aria-hidden="true">${esc(name.split(' ').map(x=>x[0]).join('').slice(0,2))}</div><h1>${esc(name)}</h1><p>Compte de démonstration</p></header>${groups.map(group=>`<div class="sim-group sim-spaced">${group.map(label=>`<button class="sim-option-row" data-account-page="${esc(label)}" aria-label="${esc(label)}"><span>${esc(label)}</span><span class="sim-chevron">›</span></button>`).join('')}</div>`).join('')}<h3 class="sim-section-label">APPAREILS</h3><div class="sim-group">${devices.map(device=>`<button class="sim-option-row sim-device-row" data-device="${esc(device.id)}"><span class="sim-device-symbol" aria-hidden="true">${device.id==='mac'?'▱':device.id==='watch'?'◉':'▯'}</span><span><strong>${esc(device.name)}</strong><small>${esc(device.model)}${device.current?' · Cet iPhone':''}</small></span><span class="sim-chevron">›</span></button>`).join('')}</div><p class="sim-note">Appareils fictifs du simulateur. Aucun accès à votre véritable compte Apple.</p>`;
@@ -757,9 +765,9 @@ window.settingsTemplate = `
       backButton();root.querySelectorAll('[data-cloud]').forEach(input=>input.onchange=()=>{state['iCloud/'+input.dataset.cloud]=input.checked;save();});root.querySelector('[data-backup]').onclick=()=>{pages['Sauvegarde iCloud']=[toggle('Sauvegarder cet iPhone',false),info('Dernière sauvegarde','Aucune sauvegarde iCloud réelle'),info('Conservation des données','Les apps enregistrent leurs données dans ce navigateur')];open('Sauvegarde iCloud');};
     }
     function renderAccountDevice(id) {
-      const devices=get('account/devices',[{id:'iphone',name:'iPhone de Yoel',model:'iPhone 17 Pro',current:true},{id:'mac',name:'MacBook Pro',model:'MacBook Pro 14 pouces'},{id:'watch',name:'Apple Watch',model:'Apple Watch Series 10'}]);
+      const devices=get('account/devices',[{id:'iphone',name:'iPhone de Yoel',model:'iPhone 17 Pro Max',current:true},{id:'mac',name:'MacBook Pro',model:'MacBook Pro 14 pouces'},{id:'watch',name:'Apple Watch',model:'Apple Watch Series 10'}]);
       const device=devices.find(item=>item.id===id);if(!device){route.pop();return render();}
-      root.innerHTML=nav(device.name,'Compte Apple')+`<header class="sim-account-hero"><div class="sim-device-large" aria-hidden="true">${id==='mac'?'▱':id==='watch'?'◉':'▯'}</div><h1>${esc(device.name)}</h1></header><div class="sim-group"><div class="sim-row"><span>Modèle</span><span class="sim-value">${esc(device.model)}</span></div><div class="sim-row"><span>Version</span><span class="sim-value">${id==='iphone'?'iOS '+esc(get('update/installedMajor','18.6')):id==='mac'?'macOS':'watchOS'} · simulation</span></div><div class="sim-row"><span>Appareil de confiance</span><span class="sim-value">Oui · démonstration</span></div></div>${device.current?'<p class="sim-note">Cet iPhone est l’appareil actuel du simulateur.</p>':'<button class="sim-secondary sim-destructive" data-remove-device>Supprimer du compte</button>'}`;
+      root.innerHTML=nav(device.name,'Compte Apple')+`<header class="sim-account-hero"><div class="sim-device-large" aria-hidden="true">${id==='mac'?'▱':id==='watch'?'◉':'▯'}</div><h1>${esc(device.name)}</h1></header><div class="sim-group"><div class="sim-row"><span>Modèle</span><span class="sim-value">${esc(device.model)}</span></div><div class="sim-row"><span>Version</span><span class="sim-value">${id==='iphone'?'iOS '+esc(get('update/installedMajor','27.1')):id==='mac'?'macOS':'watchOS'} · simulation</span></div><div class="sim-row"><span>Appareil de confiance</span><span class="sim-value">Oui · démonstration</span></div></div>${device.current?'<p class="sim-note">Cet iPhone est l’appareil actuel du simulateur.</p>':'<button class="sim-secondary sim-destructive" data-remove-device>Supprimer du compte</button>'}`;
       backButton();root.querySelector('[data-remove-device]')?.addEventListener('click',()=>{if(!confirm('Retirer cet appareil fictif du compte du simulateur ?'))return;state['account/devices']=devices.filter(item=>item.id!==id);save();route.pop();render();});
     }
     function renderBattery() {
