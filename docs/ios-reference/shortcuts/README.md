@@ -35,3 +35,27 @@ rechargement et mise à jour simulée d’iOS 27.
 
 Les versions sont de simples préférences locales : une mise à jour simulée iOS
 ne les réinitialise pas et ne supprime pas les raccourcis.
+
+
+## Captures natives supplémentaires
+
+[Session GitHub Actions du 17 octobre 2026](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39066343756),
+iPhone 16 Pro Max, iOS 26.2 build 23C54, mode sombre : **3 tests, 1 réussi,
+2 ignorés, aucune erreur**. Le scope `shortcuts` a produit **15 captures PNG**,
+dont deux diagnostics de menus non trouvés. Les **13 écrans utiles** sont dans la
+[galerie native](native/index.html) : bibliothèque, recherche, éditeur vide,
+recherches d’actions, Automatisation et Galerie avec leurs parties inférieures.
+
+La page Apple Intelligence et le menu de mise à jour n’ont pas été trouvés par
+les tests de cette session. Les recherches Texte, Utiliser un modèle, Résumer,
+Apple Intelligence et Wi-Fi affichent des listes vides dans les captures :
+cela ne permet pas de valider une exécution native d’Apple Intelligence, ni
+l’intégralité du catalogue d’actions. Aucune capture d’un modèle Apple actif
+n’a été obtenue. Le mode local avec Apple Intelligence est donc inspiré de la
+documentation Apple ; il n’est pas présenté comme une session native validée.
+
+L’éditeur vide du simulateur a été ajusté après inspection de ces captures :
+instructions centrales, panneau inférieur arrondi, barre de recherche et
+catégories. Le choix entre les deux versions reste une fonction propre au site.
+Les paramètres et les données sont aussi conservés lors d’une mise à jour ou
+d’un changement de nom de l’app dans le registre partagé.

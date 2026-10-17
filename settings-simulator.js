@@ -211,7 +211,7 @@
         root.querySelector('.sim-alphabet').innerHTML=[...groups.keys()].map(letter=>`<button aria-label="Aller à ${esc(letter)}" data-index="${esc(letter)}">${esc(letter)}</button>`).join('');
         root.querySelector('.sim-default-apps').hidden=Boolean(search.value);
         root.querySelectorAll('[data-index]').forEach(button=>button.onclick=()=>{const section=[...root.querySelectorAll('[data-letter]')].find(el=>el.dataset.letter===button.dataset.index);if(section){root.scrollTop=section.offsetTop-70;section.querySelector('button')?.focus({preventScroll:true});}});
-        root.querySelectorAll('[data-app-id]').forEach(button=>button.onclick=()=>{const app=list.find(a=>a.id===button.dataset.appId);if(app)open('App : '+app.name);});
+        root.querySelectorAll('[data-app-id]').forEach(button=>button.onclick=()=>{const app=list.find(a=>a.id===button.dataset.appId);if(app)open('App : '+(app.id==='shortcuts'?'Raccourcis':app.name));});
       }
       search.oninput=filter;filter();backButton();root.querySelector('[data-defaults]').onclick=()=>open('Apps par défaut');if(focused)search.focus({preventScroll:true});root.scrollTop=query?scroll:0;
     }

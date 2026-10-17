@@ -41,3 +41,6 @@ L’entrée `scope=shortcuts` limite la session aux tests détaillés de Raccour
 captures couvrent les recherches d’actions, l’éditeur, Automatisation et Galerie
 quand ces contrôles sont présents. Les options absentes ne sont pas inventées ;
 la capture ne force pas le téléchargement de modèles ni la connexion à un compte.
+
+Session détaillée validée : 3 tests, 1 réussi, 2 ignorés, 15 captures PNG ; voir
+le [rapport Raccourcis](../../docs/ios-reference/shortcuts/README.md).
