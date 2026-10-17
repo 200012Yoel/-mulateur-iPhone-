@@ -34,3 +34,10 @@ le même modèle. La session étendue comprend 14 tests, dont 7 réussis et 7 ig
 et 19 captures. Photos et Wallet sont présents ; Appareil photo ne l’est pas.
 Aucune mise à jour OTA n’est possible dans le menu manquant. Voir le
 [rapport complet](../../docs/ios-reference/README.md) pour les résultats et limites.
+
+
+L’entrée `scope=shortcuts` limite la session aux tests détaillés de Raccourcis,
+à la page de disponibilité Apple Intelligence et au menu de mise à jour. Les
+captures couvrent les recherches d’actions, l’éditeur, Automatisation et Galerie
+quand ces contrôles sont présents. Les options absentes ne sont pas inventées ;
+la capture ne force pas le téléchargement de modèles ni la connexion à un compte.

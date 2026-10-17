@@ -118,3 +118,7 @@ mise à jour. Elles sont distinctes des images natives dans `ios26/`. Les donné
 personnelles, appareils, chiffres de batterie et billets y sont des exemples de test.
 Ces captures documentent une reproduction partielle, pas une conformité pixel
 par pixel de l’ensemble d’iOS ni l’accès aux services Apple.
+
+
+Le [rapport Raccourcis à deux modes](shortcuts/README.md) décrit le choix de version,
+les actions disponibles et la galerie des captures de la reconstruction.

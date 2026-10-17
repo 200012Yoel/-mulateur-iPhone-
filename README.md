@@ -135,3 +135,32 @@ dépend de la caméra. Les modes Cinématique, Ralenti et Accéléré restent de
 présentations de démonstration. Les enregistrements n’incluent pas de microphone.
 Le stockage du navigateur est limité : les longues vidéos ne conviennent pas à
 ce stockage local. Le flux caméra est arrêté à la sortie de l’app.
+
+
+### Deux versions de Raccourcis
+
+Dans Raccourcis, le bouton ⚙ ouvre les réglages. « Version de Raccourcis »
+permet de choisir **Classique** ou **Apple Intelligence**. Ce même choix est
+accessible dans Réglages > Apps > Raccourcis. Le choix est conservé dans
+`iphone.settings.v1`, clé `App : Raccourcis/Version de Raccourcis`, y compris
+après une mise à jour iOS simulée. Les deux modes partagent les mêmes raccourcis.
+
+Le mode Classique garde les actions standard. Le mode Apple Intelligence ajoute
+un panneau d’entrée, des modèles dans la Galerie et les actions « Utiliser un
+modèle », « Résumer le texte » et « Extraire les points clés ». La recherche et
+les catégories du sélecteur permettent de retrouver les actions. Les actions
+existantes sont modifiables, réordonnables et supprimables ; le résultat d’une
+action texte alimente la suivante. Les résultats peuvent être masqués ou copiés.
+Une action intelligente sauvegardée est conservée en mode Classique, mais son
+exécution est bloquée avant les effets des autres actions de ce raccourci.
+
+**Limite fonctionnelle explicite** : ces noms reproduisent une interface inspirée
+d’Apple Intelligence ; le moteur Apple n’est pas présent dans ce site. Le résumé
+est une extraction déterministe de deux phrases, les points clés sont une liste
+de phrases et la transformation en majuscules est locale. Aucun texte n’est envoyé
+à Apple, Private Cloud Compute ou ChatGPT. Les options distantes sont indisponibles.
+Ce choix de version dans l’app est une fonction propre à ce simulateur web.
+
+`node tests/shortcuts-modes.cjs` vérifie les deux modes, leurs réglages partagés,
+les actions, l’édition, le blocage, la conservation après rechargement et après
+installation simulée d’iOS 27 ; il génère vingt-trois captures de parcours distincts.
