@@ -2,7 +2,7 @@
 
 Lancement **manuel uniquement**, sur `macos-15`, limité à 20 minutes. Aucun
 compte Apple, secret, bureau distant ou tunnel réseau. Le script choisit un
-runtime déjà installé (iOS 18 par défaut), crée un iPhone 16 Pro Max, démarre
+runtime déjà installé (iOS 26 par défaut, ou `IOS_MAJOR=18`), crée un iPhone 16 Pro Max, démarre
 le simulateur en sombre et exécute des tests XCUITest sur l’app Réglages native.
 Il capture les écrans et arbres d’accessibilité : accueil, Wi-Fi, Apps, Safari,
 mise à jour. Les menus absents sont signalés comme ignorés, jamais comme vérifiés.
@@ -27,3 +27,20 @@ deux ont été ignorés : Wi-Fi et Mise à jour logicielle ne sont pas présents
 le runtime testé. [Résultats](https://github.com/200012Yoel/-mulateur-iPhone-/actions/runs/39062276956).
 L’attente du chargement de la liste Apps a ensuite été renforcée ; cette dernière
 modification n’a pas déclenché une nouvelle session cloud.
+
+
+Le 17 octobre 2026, les références iOS 26.2 ont été capturées avec succès sur
+le même modèle. La session étendue comprend 14 tests, dont 7 réussis et 7 ignorés,
+et 19 captures. Photos et Wallet sont présents ; Appareil photo ne l’est pas.
+Aucune mise à jour OTA n’est possible dans le menu manquant. Voir le
+[rapport complet](../../docs/ios-reference/README.md) pour les résultats et limites.
+
+
+L’entrée `scope=shortcuts` limite la session aux tests détaillés de Raccourcis,
+à la page de disponibilité Apple Intelligence et au menu de mise à jour. Les
+captures couvrent les recherches d’actions, l’éditeur, Automatisation et Galerie
+quand ces contrôles sont présents. Les options absentes ne sont pas inventées ;
+la capture ne force pas le téléchargement de modèles ni la connexion à un compte.
+
+Session détaillée validée : 3 tests, 1 réussi, 2 ignorés, 15 captures PNG ; voir
+le [rapport Raccourcis](../../docs/ios-reference/shortcuts/README.md).

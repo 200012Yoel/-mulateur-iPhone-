@@ -3,26 +3,61 @@ on:
   workflow_dispatch:
     inputs:
       ios_major:
-        description: Version majeure déjà installée sur le runner (18 ou auto)
-        default: '18'
+        description: Version majeure déjà installée sur le runner (27)
+        default: '27'
         required: true
+      model:
+        description: Modèle de référence
+        type: choice
+        options: [iPhone 17 Pro Max]
+        default: iPhone 17 Pro Max
+      ios_version:
+        description: Version native exacte de référence ; distincte du profil HTML
+        default: '27.0'
+      runner:
+        description: Image Xcode du runner
+        type: choice
+        options: [macos-15, xcode-27]
+        default: xcode-27
+      method:
+        description: Capture directe par liens Apple ou parcours interactif XCTest
+        type: choice
+        options: [direct, interactive]
+        default: direct
+      scope:
+        description: Écrans à capturer
+        type: choice
+        options: [all, shortcuts]
+        default: shortcuts
 permissions:
   contents: read
 jobs:
   capture:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Démarrer le simulateur et capturer Réglages
         env:
           IOS_MAJOR: ${{ inputs.ios_major }}
-        run: python3 scripts/ios-reference/capture.py
+          CAPTURE_METHOD: ${{ inputs.method }}
+          CAPTURE_SCOPE: ${{ inputs.scope }}
+          IOS_MODEL: ${{ inputs.model }}
+          IOS_VERSION: ${{ inputs.ios_version }}
+        run: python3 developpement/scripts/ios-reference/capture.py
       - name: Conserver les captures et diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-settings-reference
-          path: artifacts/ios-reference
+          path: |
+            artifacts/ios-reference/selection.json
+            artifacts/ios-reference/inventory.json
+            artifacts/ios-reference/capabilities.json
+            artifacts/ios-reference/direct-capture.json
+            artifacts/ios-reference/xcodebuild.log
+            artifacts/ios-reference/last-screen.png
+            artifacts/ios-reference/frames/
+            artifacts/ios-reference/screenshots/
           retention-days: 7
           if-no-files-found: warn
