@@ -282,7 +282,7 @@ var airplaneIcon = `
     </svg>;
 `;
 
-                        
+
 window.settingsTemplate = `
     <h1>R\xE9glages</h1>
 
