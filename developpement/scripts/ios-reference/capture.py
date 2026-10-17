@@ -68,6 +68,23 @@ def main():
             capabilities[name] = check.returncode == 0
         (OUT / "capabilities.json").write_text(json.dumps(capabilities, indent=2))
         (OUT / "Capabilities.swift").write_text("enum ReferenceCapabilities {\n" + "\n".join(f"static let {key} = {str(value).lower()}" for key, value in capabilities.items()) + "\n}\n")
+        if os.environ.get("CAPTURE_METHOD") == "direct":
+            frames=OUT / "frames"
+            frames.mkdir(exist_ok=True)
+            log=[]
+            subprocess.run(["xcrun","simctl","status_bar",device,"override","--time","9:41","--batteryState","charged","--batteryLevel","100"],capture_output=True,timeout=20)
+            launch=subprocess.run(["xcrun","simctl","launch",device,"com.apple.shortcuts","-AppleLanguages","(fr)","-AppleLocale","fr_FR"],capture_output=True,text=True,timeout=30)
+            log.append({"launch_returncode":launch.returncode,"stdout":launch.stdout,"stderr":launch.stderr})
+            routes=[("direct-01-library","shortcuts://"),("direct-02-editor","shortcuts://create-shortcut"),("direct-03-gallery","shortcuts://gallery")]
+            for name,url in routes:
+                result=subprocess.run(["xcrun","simctl","openurl",device,url],capture_output=True,text=True,timeout=25)
+                log.append({"name":name,"url":url,"returncode":result.returncode,"stderr":result.stderr})
+                time.sleep(8)
+                subprocess.run(["xcrun","simctl","io",device,"screenshot",str(frames/(name+".png"))],check=True,timeout=20)
+                time.sleep(4)
+                subprocess.run(["xcrun","simctl","io",device,"screenshot",str(frames/(name+"-settled.png"))],check=True,timeout=20)
+            (OUT / "direct-capture.json").write_text(json.dumps(log,indent=2))
+            return
         run("ruby", str(ROOT / "developpement/scripts/ios-reference/project.rb"), str(OUT))
         with (OUT / "xcodebuild.log").open("w") as log:
             run("xcodebuild", "test", "-project", str(OUT / "Reference.xcodeproj"),

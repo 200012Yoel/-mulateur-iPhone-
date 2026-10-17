@@ -19,6 +19,11 @@ on:
         type: choice
         options: [macos-15, xcode-27]
         default: xcode-27
+      method:
+        description: Capture directe par liens Apple ou parcours interactif XCTest
+        type: choice
+        options: [direct, interactive]
+        default: direct
       scope:
         description: Écrans à capturer
         type: choice
@@ -35,6 +40,7 @@ jobs:
       - name: Démarrer le simulateur et capturer Réglages
         env:
           IOS_MAJOR: ${{ inputs.ios_major }}
+          CAPTURE_METHOD: ${{ inputs.method }}
           CAPTURE_SCOPE: ${{ inputs.scope }}
           IOS_MODEL: ${{ inputs.model }}
           IOS_VERSION: ${{ inputs.ios_version }}
@@ -48,6 +54,7 @@ jobs:
             artifacts/ios-reference/selection.json
             artifacts/ios-reference/inventory.json
             artifacts/ios-reference/capabilities.json
+            artifacts/ios-reference/direct-capture.json
             artifacts/ios-reference/xcodebuild.log
             artifacts/ios-reference/last-screen.png
             artifacts/ios-reference/frames/
