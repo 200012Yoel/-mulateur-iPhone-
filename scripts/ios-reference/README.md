@@ -2,7 +2,7 @@
 
 Lancement **manuel uniquement**, sur `macos-15`, limité à 20 minutes. Aucun
 compte Apple, secret, bureau distant ou tunnel réseau. Le script choisit un
-runtime déjà installé (iOS 18 par défaut), crée un iPhone 16 compatible, démarre
+runtime déjà installé (iOS 18 par défaut), crée un iPhone 16 Pro Max, démarre
 le simulateur en sombre et exécute des tests XCUITest sur l’app Réglages native.
 Il capture les écrans et arbres d’accessibilité : accueil, Wi-Fi, Apps, Safari,
 mise à jour. Les menus absents sont signalés comme ignorés, jamais comme vérifiés.

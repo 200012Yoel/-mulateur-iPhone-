@@ -17,7 +17,6 @@ def main():
     if platform.system() != "Darwin":
         raise SystemExit("Ce script nécessite macOS et Xcode ; il ne lance rien sous Windows.")
     OUT.mkdir(parents=True, exist_ok=True)
-    run("ruby", "-rxcodeproj", "-e", "puts 'xcodeproj disponible'")
     result = run("xcrun", "simctl", "list", "--json", capture_output=True)
     inventory = json.loads(result.stdout)
     (OUT / "inventory.json").write_text(result.stdout)
@@ -29,8 +28,10 @@ def main():
         raise SystemExit(f"Aucun runtime iOS {requested} installé. Voir inventory.json. Aucun téléchargement automatique.")
     runtime = max(runtimes, key=lambda r: tuple(int(n) for n in r["version"].split(".")))
     types = [d for d in inventory["devicetypes"] if d["name"].startswith("iPhone")]
-    # iPhone 16 supports iOS 18; select from reported device types, not a guessed UUID.
-    model = next((d for d in types if d["name"] == "iPhone 16"), types[-1])
+    model = next((d for d in types if d["name"] == "iPhone 16 Pro Max"), None)
+    if model is None:
+        raise SystemExit("Le modèle demandé iPhone 16 Pro Max est absent du runner.")
+    run("ruby", "-rxcodeproj", "-e", "puts 'xcodeproj disponible'")
     device = run("xcrun", "simctl", "create", "Settings Reference", model["identifier"], runtime["identifier"], capture_output=True).stdout.strip()
     (OUT / "selection.json").write_text(json.dumps({"runtime": runtime, "deviceType": model, "udid": device}, indent=2))
     try:
